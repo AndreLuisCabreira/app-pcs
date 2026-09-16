@@ -1,0 +1,153 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>IntraTech — PC Builder · Protótipo para Figma</title>
+  <meta name="description" content="Versão visual em HTML e CSS das telas JavaFX do IntraTech PC Builder.">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <input class="state-control" id="dark-mode" type="checkbox">
+  <input class="state-control" id="sidebar-small" type="checkbox">
+
+  <main class="prototype">
+    <section class="screen auth-screen" id="login">
+      <div class="auth-card">
+        <div class="auth-presentation">
+          <img class="auth-logo" src="assets/intratech-logo.png" alt="Logo IntraTech">
+          <p class="auth-brand">IntraTech</p>
+          <h1>Monte. Compare.<br>Jogue melhor.</h1>
+          <p class="auth-copy">Sua área pessoal para criar builds compatíveis e guardar as configurações favoritas.</p>
+          <p class="privacy-note">Cada conta possui builds e favoritos separados.</p>
+        </div>
+        <div class="auth-form-panel">
+          <div class="theme-row"><label class="theme-toggle" for="dark-mode">◐ <span>Alternar tema</span></label></div>
+          <p class="eyebrow">ÁREA DO USUÁRIO</p>
+          <h2>Acesse o PC Builder</h2>
+          <p class="subtitle">Entre com sua conta ou faça um cadastro gratuito.</p>
+          <input class="state-control" id="auth-login" name="auth-tab" type="radio" checked>
+          <input class="state-control" id="auth-create" name="auth-tab" type="radio">
+          <div class="auth-tabs">
+            <label for="auth-login">Entrar</label>
+            <label for="auth-create">Criar conta</label>
+          </div>
+          <form class="auth-form login-form">
+            <label>LOGIN<input type="text" placeholder="seu.login"></label>
+            <label>SENHA<input type="password" placeholder="Sua senha"></label>
+            <a class="button primary full" href="#dashboard">Entrar na minha conta</a>
+          </form>
+          <form class="auth-form create-form">
+            <label>NOME<input type="text" placeholder="Nome completo"></label>
+            <label>LOGIN<input type="text" placeholder="Escolha um login"></label>
+            <label>SENHA<input type="password" placeholder="Mínimo de 8 caracteres"></label>
+            <label>CONFIRMAR SENHA<input type="password" placeholder="Repita a senha"></label>
+            <p class="hint">A primeira conta de um banco vazio será administradora. As demais contas serão usuários comuns.</p>
+            <a class="button primary full" href="#dashboard">Criar conta e continuar</a>
+          </form>
+        </div>
+      </div>
+    </section>
+
+    <div class="app-frame">
+      <aside class="sidebar">
+        <div class="brand-block">
+          <img src="assets/intratech-logo.png" alt="Logo IntraTech">
+          <div class="sidebar-detail"><strong>IntraTech</strong><small>PC BUILDER</small></div>
+        </div>
+        <div class="collapse-row"><label for="sidebar-small" title="Recolher menu"><img src="assets/menu.png" alt=""></label></div>
+        <nav>
+          <a href="#dashboard"><img src="assets/dashboard.png" alt=""><span>Dashboard</span></a>
+          <a href="#componentes"><img src="assets/components.png" alt=""><span>Componentes</span></a>
+          <a href="#importar"><img src="assets/import.png" alt=""><span>Importar catálogo</span></a>
+          <a href="#benchmarks"><img src="assets/benchmarks.png" alt=""><span>Benchmarks</span></a>
+          <a href="#builds"><img src="assets/builds.png" alt=""><span>Minhas builds</span></a>
+          <a href="#analises"><img src="assets/analysis.png" alt=""><span>Análises</span></a>
+        </nav>
+        <div class="sidebar-bottom">
+          <p class="side-label sidebar-detail">APARÊNCIA</p>
+          <label class="side-theme" for="dark-mode">◐ <span>Alternar tema</span></label>
+          <p class="side-label sidebar-detail">BANCO DE DADOS</p>
+          <p class="db-status sidebar-detail">● Supabase conectado</p>
+          <div class="account">
+            <div class="identity"><span class="avatar">SA</span><span class="sidebar-detail"><strong>Sylvie Admin</strong><small>@sylvie</small></span></div>
+            <span class="role sidebar-detail">ADMINISTRADOR</span>
+            <a class="logout sidebar-detail" href="#login">Sair da conta</a>
+          </div>
+        </div>
+      </aside>
+
+      <div class="content-area">
+        <section class="screen page dashboard" id="dashboard">
+          <header><h1>Olá, Sylvie Admin</h1><p>Acompanhe apenas as suas builds, favoritas e análises.</p></header>
+          <div class="metrics">
+            <article class="metric"><small>MINHAS BUILDS</small><strong>3</strong><span>Montagens da sua conta</span></article>
+            <article class="metric"><small>FAVORITAS</small><strong>2</strong><span>Favoritas da sua conta</span></article>
+            <article class="metric"><small>COMPONENTES</small><strong>48</strong><span>Itens no catálogo</span></article>
+          </div>
+          <div class="section-heading"><div><h2>Suas builds</h2><p>Uma visão rápida das peças principais de cada montagem.</p></div><button class="button favorite">☆ Mostrar favoritas</button></div>
+          <div class="build-grid">
+            <article class="build-card favorite-card">
+              <div class="build-head"><span class="build-icon">▦</span><div><h3>Setup principal</h3><small>Configuração personalizada</small></div><span class="star">★</span></div>
+              <div class="part"><b>CPU</b><span>AMD Ryzen 7 7700</span></div><div class="part"><b>GPU</b><span>GeForce RTX 4070</span></div><div class="part"><b>RAM</b><span>Kingston Fury 32 GB</span></div>
+              <small class="price-label">VALOR DA BUILD</small><strong class="price">R$ 9.429,50</strong>
+            </article>
+            <article class="build-card">
+              <div class="build-head"><span class="build-icon">▦</span><div><h3>PC competitivo</h3><small>Configuração personalizada</small></div><span class="star muted">☆</span></div>
+              <div class="part"><b>CPU</b><span>Intel Core i5-14600K</span></div><div class="part"><b>GPU</b><span>Radeon RX 7800 XT</span></div><div class="part"><b>RAM</b><span>Corsair Vengeance 32 GB</span></div>
+              <small class="price-label">VALOR DA BUILD</small><strong class="price">R$ 8.870,00</strong>
+            </article>
+            <article class="build-card favorite-card">
+              <div class="build-head"><span class="build-icon">▦</span><div><h3>Estação compacta</h3><small>Configuração personalizada</small></div><span class="star">★</span></div>
+              <div class="part"><b>CPU</b><span>AMD Ryzen 5 7600</span></div><div class="part"><b>GPU</b><span>GeForce RTX 4060</span></div><div class="part"><b>RAM</b><span>Kingston Fury 16 GB</span></div>
+              <small class="price-label">VALOR DA BUILD</small><strong class="price">R$ 6.235,90</strong>
+            </article>
+          </div>
+        </section>
+
+        <section class="screen page" id="componentes">
+          <header><h1>Catálogo de componentes</h1><p>Cadastre novas peças ou selecione um item da lista para corrigir seus dados.</p></header>
+          <div class="tabs component-tabs"><span class="active">Processadores</span><span>Placas-mãe</span><span>Placas de vídeo</span><span>Memórias</span><span>SSDs</span><span>Fontes</span></div>
+          <div class="split-layout">
+            <article class="panel form-panel"><h2>Novo componente</h2><div class="form-grid">
+              <label>NOME<input placeholder="Ex.: Ryzen 7 7700"></label><label>FABRICANTE<input placeholder="AMD ou Intel"></label>
+              <label>PREÇO<input placeholder="1999,90"></label><label>SOCKET<input placeholder="AM5"></label>
+              <label>NÚCLEOS<input placeholder="8"></label><label>THREADS<input placeholder="16"></label>
+              <label>CONSUMO (W)<input placeholder="65"></label><label>ÍNDICE DE DESEMPENHO<input placeholder="100"></label>
+            </div><div class="actions"><button class="button primary">Salvar componente</button><button class="button secondary">Cancelar edição</button></div></article>
+            <article class="panel list-panel"><h2>Processadores cadastrados</h2><p class="muted-copy">Selecione um item e clique em editar para corrigir seus dados.</p>
+              <ul class="catalog-list"><li class="selected"><div><strong>AMD Ryzen 7 7700</strong><small>AMD · AM5 · 8 núcleos</small></div><span>R$ 1.999,90</span></li><li><div><strong>Intel Core i5-14600K</strong><small>Intel · LGA1700 · 14 núcleos</small></div><span>R$ 2.149,00</span></li><li><div><strong>AMD Ryzen 5 7600</strong><small>AMD · AM5 · 6 núcleos</small></div><span>R$ 1.329,90</span></li></ul>
+              <button class="button secondary">Editar selecionado</button></article>
+          </div>
+        </section>
+
+        <section class="screen page" id="importar">
+          <header><h1>Importar catálogo</h1><p>Lista direta do PC Part Dataset, sem chave ou configuração de API.</p></header>
+          <article class="panel filters"><label>TIPO DE COMPONENTE<select><option>Processador</option><option>Placa de vídeo</option><option>Fonte</option></select></label><label class="grow">FILTRAR LISTA<span class="inline"><input placeholder="Filtre por nome, fabricante ou especificação"><button class="button primary">Atualizar lista</button></span></label><p class="db-status">● 124 componentes. Fonte: docyx/pc-part-dataset.</p></article>
+          <div class="import-layout"><article class="panel table-panel"><h2>Componentes disponíveis</h2><div class="table-wrap"><table><thead><tr><th>ID</th><th>Componente</th><th>Fabricante</th><th>Preço do dataset</th></tr></thead><tbody><tr class="selected"><td>a8f40c1d</td><td>AMD Ryzen 7 7700X</td><td>AMD</td><td>US$ 287.00</td></tr><tr><td>20c487a1</td><td>Intel Core i5-14600K</td><td>Intel</td><td>US$ 314.99</td></tr><tr><td>77bd19e2</td><td>AMD Ryzen 5 7600</td><td>AMD</td><td>US$ 189.00</td></tr></tbody></table></div></article>
+            <article class="panel review-panel"><h2>Revisar antes de importar</h2><p class="notice">Preço no dataset: US$ 287.00<br>Informe abaixo o preço local em reais.</p><label>NOME<input value="AMD Ryzen 7 7700X"></label><label>FABRICANTE<input value="AMD"></label><label>PREÇO LOCAL (R$)<input placeholder="Ex.: 1999,90"></label><label>SOCKET<input placeholder="Preenchimento necessário"></label><label>NÚCLEOS<input value="8"></label><button class="button primary full">Importar componente</button></article>
+          </div>
+        </section>
+
+        <section class="screen page" id="benchmarks">
+          <header><h1>Benchmarks de FPS</h1><p>Registre medições reais para aprimorar as estimativas das suas configurações.</p></header>
+          <div class="split-layout benchmark-layout"><article class="panel form-panel"><h2>Nova medição</h2><div class="form-grid one-column"><label>JOGO<select><option>Cyberpunk 2077</option></select></label><button class="button secondary">Adicionar jogo</button><label>PROCESSADOR<select><option>AMD Ryzen 7 7700</option></select></label><label>PLACA DE VÍDEO<select><option>GeForce RTX 4070</option></select></label><div class="form-grid"><label>RESOLUÇÃO<select><option>1920 × 1080</option></select></label><label>QUALIDADE<select><option>Ultra</option></select></label></div><label>FPS MÉDIO<input value="112"></label></div><p class="notice">Use a média de uma sessão estável para manter as estimativas consistentes.</p><button class="button primary full">Salvar medição</button></article>
+            <article class="panel list-panel"><h2>Medições cadastradas</h2><ul class="catalog-list"><li><div><strong>Cyberpunk 2077 · 112 FPS</strong><small>RTX 4070 · Ryzen 7 7700 · 1080p Ultra</small></div></li><li><div><strong>Forza Horizon 5 · 146 FPS</strong><small>RX 7800 XT · Core i5-14600K · 1440p Alto</small></div></li><li><div><strong>Valorant · 392 FPS</strong><small>RTX 4060 · Ryzen 5 7600 · 1080p Competitivo</small></div></li></ul></article></div>
+        </section>
+
+        <section class="screen page" id="builds">
+          <header><h1>Minhas builds</h1><p>Crie e gerencie configurações compatíveis vinculadas à sua conta.</p></header>
+          <div class="split-layout build-form-layout"><article class="panel form-panel"><h2>Nova build</h2><p class="muted-copy">Escolha uma peça de cada categoria. A compatibilidade e o consumo serão verificados ao salvar.</p><div class="form-grid one-column"><label>NOME DA BUILD<input placeholder="Ex.: Setup principal"></label><label>PROCESSADOR<select><option>AMD Ryzen 7 7700</option></select></label><label>PLACA-MÃE<select><option>ASUS TUF Gaming B650M</option></select></label><label>PLACA DE VÍDEO<select><option>GeForce RTX 4070</option></select></label><label>MEMÓRIA<select><option>Kingston Fury 32 GB DDR5</option></select></label><label>SSD<select><option>Kingston NV2 1 TB</option></select></label><label>FONTE<select><option>Corsair RM750e 750 W</option></select></label><label class="check"><input type="checkbox"> Marcar como favorita</label></div><div class="actions"><button class="button primary">Salvar build</button><button class="button secondary">Cancelar edição</button></div></article>
+            <article class="panel table-panel"><h2>Builds cadastradas</h2><div class="table-wrap"><table><thead><tr><th>Nome</th><th>Processador</th><th>Placa de vídeo</th><th>Total</th><th>Favorita</th></tr></thead><tbody><tr class="selected"><td>Setup principal</td><td>Ryzen 7 7700</td><td>RTX 4070</td><td>R$ 9.429,50</td><td>★</td></tr><tr><td>PC competitivo</td><td>Core i5-14600K</td><td>RX 7800 XT</td><td>R$ 8.870,00</td><td>☆</td></tr></tbody></table></div><div class="actions"><button class="button secondary">Editar selecionada</button><button class="button danger">Excluir selecionada</button><button class="button ghost">Atualizar lista</button></div></article></div>
+        </section>
+
+        <section class="screen page" id="analises">
+          <header><h1>Análises</h1><p>Compare desempenho estimado, consumo e custo da sua build.</p></header>
+          <article class="panel analysis-filters"><div class="form-grid four"><label>BUILD<select><option>Setup principal</option></select></label><label>JOGO<select><option>Cyberpunk 2077</option></select></label><label>RESOLUÇÃO<select><option>1920 × 1080</option></select></label><label>QUALIDADE<select><option>Ultra</option></select></label></div><div class="actions"><button class="button primary">Analisar configuração</button><button class="button secondary">Recarregar dados</button></div></article>
+          <article class="panel analysis-results"><h2>Resultado</h2><div class="analysis-metrics"><div class="analysis-card positive"><small>FPS ESTIMADO</small><strong>108</strong></div><div class="analysis-card positive"><small>COMPATIBILIDADE</small><strong>Compatível</strong></div><div class="analysis-card negative"><small>CONSUMO ESTIMADO</small><strong>415 W</strong></div><div class="analysis-card positive"><small>FOLGA DA FONTE</small><strong>335 W</strong></div></div><div class="parts-summary"><div><span>Processador</span><strong>AMD Ryzen 7 7700</strong></div><div><span>Placa de vídeo</span><strong>GeForce RTX 4070</strong></div><div><span>Memória</span><strong>Kingston Fury 32 GB DDR5</strong></div><div><span>Custo total</span><strong>R$ 9.429,50</strong></div></div><p class="notice">Estimativa baseada em medições cadastradas e no índice relativo dos componentes.</p></article>
+        </section>
+      </div>
+    </div>
+  </main>
+</body>
+</html>
