@@ -53,6 +53,7 @@ public final class ConfiguracaoAplicacao {
         if (caminhoConfigurado != null && !caminhoConfigurado.isBlank()) {
             return Path.of(caminhoConfigurado.trim()).toAbsolutePath().normalize();
         }
-        return Path.of(".env").toAbsolutePath().normalize();
+        Path local = Path.of(".env.local").toAbsolutePath().normalize();
+        return Files.isRegularFile(local) ? local : Path.of(".env").toAbsolutePath().normalize();
     }
 }

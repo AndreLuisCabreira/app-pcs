@@ -116,7 +116,7 @@ $env:DB_PASSWORD = ''
 $env:DB_ALLOW_EMPTY_PASSWORD = 'true'
 ```
 
-O aplicativo lê o arquivo `.env` da pasta `Montagem-PCs`, mantendo as variáveis do sistema como prioridade. A configuração de execução do VS Code já define as variáveis do banco para o ambiente local. Não envie o `.env` para o Git; ele já está ignorado pelo projeto.
+Copie `.env.example` para `.env.local` e preencha os dados do banco. O aplicativo lê primeiro `.env.local` da raiz do projeto (ou `.env` como alternativa), mantendo as variáveis do sistema como prioridade. A configuração de execução do VS Code inicia o aplicativo na raiz do projeto, onde esse arquivo é localizado. Não envie `.env.local` nem `.env` para o Git; ambos estão ignorados pelo projeto.
 
 ### 4. Preparar ou atualizar a estrutura
 
@@ -151,9 +151,9 @@ O ZIP será criado em `dist\IntraTech-PC-Builder-1.8.1-windows-x64.zip`. O arqui
 
 1. Abra a pasta `projeto` ou `Montagem-PCs`.
 2. Pressione `F5`.
-3. Selecione **Executar PC Builder (configuração .env)**.
+3. Selecione **Executar PC Builder (configuração .env.local)**.
 
-Ao abrir a pasta pai `projeto`, o VS Code executa primeiro o script de compilação e inicia `DesktopLauncher` com JavaFX e o driver do banco no classpath.
+Abra a pasta que contém `pom.xml` e `.env.local`. Instale as extensões Java do VS Code, configure JDK 21 ou superior e aguarde a importação do projeto Maven. A execução inicia `DesktopLauncher` na raiz do projeto. Pelo terminal, use `mvn javafx:run`.
 
 Na primeira execução de um banco vazio, use a aba **Criar conta**. A primeira conta recebe o perfil de administrador. Depois do login, a aplicação mostra somente as builds e favoritas vinculadas àquela conta.
 

@@ -3,7 +3,9 @@
 *.iml
 out/
 target/
+dist/
 .env
+.env.local
 *.log
 .tools/
 !**/src/main/**/out/

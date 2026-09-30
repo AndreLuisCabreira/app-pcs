@@ -41,7 +41,10 @@ if ($missingDependencies.Count -gt 0) {
 }
 
 $classPath = (@((Join-Path $projectDirectory 'target\classes')) + $dependencies) -join [IO.Path]::PathSeparator
-$configurationFile = Join-Path $projectDirectory '.env'
+$configurationFile = Join-Path $projectDirectory '.env.local'
+if (-not (Test-Path -LiteralPath $configurationFile)) {
+    $configurationFile = Join-Path $projectDirectory '.env'
+}
 $javaArguments = @(
     '-Dfile.encoding=UTF-8',
     "-Dintratech.config=$configurationFile",
