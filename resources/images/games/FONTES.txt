@@ -1,0 +1,6 @@
+counter-strike-2: https://cdn.akamai.steamstatic.com/steam/apps/730/library_600x900_2x.jpg
+cyberpunk-2077: https://cdn.akamai.steamstatic.com/steam/apps/1091500/library_600x900_2x.jpg
+fortnite: https://cdn1.epicgames.com/offer/fn/FNBR_42-30_Fortnitemares_KeyArt_Fortnitemares_EGS_Launcher_Blade_2560x1440_2560x1440-e9efecdfb1084ebaa70632886875b674?h=800&quality=medium&resize=1&w=1422
+
+Artes oficiais dos jogos, usadas somente para identificar os títulos no catálogo.
+URLs cadastradas pelo administrador têm prioridade sobre estas capas locais.
