@@ -4,17 +4,21 @@ $projectDirectory = Split-Path -Parent $PSScriptRoot
 $testOutputDirectory = Join-Path $projectDirectory 'target\test-classes'
 $userProfileDirectory = [Environment]::GetFolderPath('UserProfile')
 
+. (Join-Path $PSScriptRoot 'java-tools.ps1')
+$jdkHome = Get-IntraTechJdk
+$maven = Get-Command mvn -ErrorAction SilentlyContinue
+if ($maven) {
+    $env:JAVA_HOME = $jdkHome
+    & $maven.Source -B -f (Join-Path $projectDirectory 'pom.xml') test
+    if ($LASTEXITCODE -ne 0) { throw 'Os testes Maven falharam.' }
+    return
+}
 & (Join-Path $PSScriptRoot 'compile.ps1')
-
-$javaExtension = Get-ChildItem -LiteralPath (Join-Path $userProfileDirectory '.vscode\extensions') -Directory |
-    Where-Object { $_.Name -like 'redhat.java-*-win32-x64' } |
-    Sort-Object Name -Descending |
-    Select-Object -First 1
-$javac = Get-ChildItem -LiteralPath $javaExtension.FullName -Recurse -Filter 'javac.exe' |
-    Select-Object -First 1 -ExpandProperty FullName
-$java = Join-Path (Split-Path -Parent $javac) 'java.exe'
+$javac = Join-Path $jdkHome 'bin\javac.exe'
+$java = Join-Path $jdkHome 'bin\java.exe'
 
 $dependencyRoots = @(
+    (Join-Path $userProfileDirectory '.m2\repository\com\h2database'),
     (Join-Path $userProfileDirectory '.m2\repository\org\junit'),
     (Join-Path $userProfileDirectory '.m2\repository\org\opentest4j'),
     (Join-Path $userProfileDirectory '.m2\repository\org\apiguardian'),
@@ -25,7 +29,7 @@ $dependencyRoots = @(
 $jars = $dependencyRoots |
     Where-Object { Test-Path -LiteralPath $_ } |
     ForEach-Object { Get-ChildItem -LiteralPath $_ -Recurse -Filter '*.jar' } |
-    Where-Object { $_.FullName -match '(5\.11\.4|1\.11\.4|1\.3\.0|1\.1\.2|2\.21\.6|2\.21|7\.0\.2|2\.0\.18)' } |
+    Where-Object { $_.FullName -match '(5\.11\.4|1\.11\.4|1\.3\.0|1\.1\.2|2\.21\.6|2\.21|7\.0\.2|2\.0\.18|2\.3\.232)' } |
     Select-Object -ExpandProperty FullName
 $classPath = (@((Join-Path $projectDirectory 'target\classes')) + $jars) -join [IO.Path]::PathSeparator
 
@@ -51,7 +55,8 @@ if ($LASTEXITCODE -ne 0) {
 }
 
 $runtimeClassPath = (@($classPath, $testOutputDirectory)) -join [IO.Path]::PathSeparator
-& $java -cp $runtimeClassPath LocalTestLauncher $testOutputDirectory
-if ($LASTEXITCODE -ne 0) {
-    throw "Os testes falharam com o código $LASTEXITCODE."
-}
+Push-Location $projectDirectory
+try {
+    & $java -cp $runtimeClassPath LocalTestLauncher $testOutputDirectory
+    if ($LASTEXITCODE -ne 0) { throw "Os testes falharam com o código $LASTEXITCODE." }
+} finally { Pop-Location }

@@ -2,6 +2,44 @@
 
 ## Não lançado
 
+### Montagem guiada — 2026-10-21
+
+- Minhas builds separa configurações salvas e assistente de montagem em abas;
+- uma categoria por etapa: CPU, placa-mãe, RAM, GPU, SSD, fonte e revisão;
+- busca por etapa, retorno, navegação por etapas disponíveis e resumo com preço/potência;
+- trocas mantêm escolhas compatíveis e avisam quando é necessário substituir peças dependentes;
+- revisão com nome/favorita e troca individual; edição mantém a build existente e seu proprietário;
+- dez testes novos; 64 testes aprovados e fluxo JavaFX exercitado em modo headless, nos temas claro/escuro e largura mínima;
+- sem alteração de schema ou migration; a compilação/execução nativa no Windows continua pendente.
+
+### Melhorias implementadas — 2026-10-21
+
+- terminal exige login e perfil ADMIN; cadastro reaproveita validações e hashes do serviço gráfico;
+- transferência MariaDB/PostgreSQL preserva gênero, descrição e URL de capa dos jogos;
+- atualizador PostgreSQL envolve DDL e RLS/revogações em transação, mantendo bloqueio das roles públicas;
+- Minha conta permite trocar senha com reautenticação e proteção contra sobrescrita concorrente;
+- administrador exporta backup JSON e restaura dados com confirmação de senha, validação e rollback em falhas;
+- comparação de duas/três builds próprias, exportação TXT/HTML e HTML de comparação imprimível em PDF;
+- filtros de orçamento, resolução e FPS nas recomendações e de termos/faixa de preço no catálogo;
+- scripts procuram JDK 21+ em JAVA_HOME/PATH, preferem Maven e disponibilizam exportação sanitizada de fonte;
+- 24 testes novos, totalizando 54 aprovados; SQL RLS exercitado em PostgreSQL WASM e telas novas renderizadas em JavaFX headless;
+- detalhes, limites e recursos pendentes em `MELHORIAS.md` e `docs/TESTING.md`. Nenhuma migration foi executada no banco do usuário.
+
+### Documentação — 2026-10-19
+
+- criada documentação de desenvolvimento, arquitetura, modelo de dados, requisitos/regras, segurança, testes, backup/recuperação e débitos técnicos em `docs/`;
+- adicionados `AGENTS.md` com regras de manutenção e `.env.example` sem credenciais;
+- README reorganizado como entrada para os guias, preservando o conhecimento útil em documentos por assunto;
+- corrigidas referências de execução do VS Code e explicitados os pré-requisitos dos scripts PowerShell;
+- documentadas diferenças de autorização do terminal, limites das migrations/RLS e campos de jogos omitidos na transferência; essas pendências não foram corrigidas no código;
+- preservados os documentos históricos e identificados os resultados de testes anteriores como históricos; build, JUnit, banco e pacote Windows não foram executados nesta entrega.
+
+### Catálogo de jogos e janela nativa
+
+- registrados no histórico os cards verticais, busca por nome/gênero, nome no foco/hover, capas locais e troca administrativa de capa por URL;
+- registrada a barra de título nativa, com controles e encaixe a cargo do sistema;
+- preservado `ATUALIZACOES-CATALOGO.md` como relato da alteração anterior; a afirmação de ausência de `target/` se refere àquele relato e não descreve o ZIP recebido nesta revisão documental.
+
 ### Recomendações por jogo
 
 - adicionada a aba Jogos para todos os usuários;

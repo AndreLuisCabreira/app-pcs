@@ -58,4 +58,10 @@ if (-not (Test-Path -LiteralPath $postgresTarget)) {
         -OutFile $postgresTarget
 }
 
-Write-Host 'Dependências do projeto instaladas.'
+$h2Directory = Join-Path $userProfileDirectory '.m2\repository\com\h2database\h2\2.3.232'
+$h2Target = Join-Path $h2Directory 'h2-2.3.232.jar'
+New-Item -ItemType Directory -Force -Path $h2Directory | Out-Null
+if (-not (Test-Path -LiteralPath $h2Target)) {
+    Invoke-WebRequest -Uri 'https://repo.maven.apache.org/maven2/com/h2database/h2/2.3.232/h2-2.3.232.jar' -OutFile $h2Target
+}
+Write-Host 'Dependências auxiliares instaladas. O Maven continua sendo a referência para o ambiente completo.'

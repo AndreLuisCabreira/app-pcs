@@ -72,12 +72,12 @@ public final class UiSupport {
     public static double decimal(TextField campo, String nome) {
         try {
             double valor = Double.parseDouble(campo.getText().trim().replace(',', '.'));
-            if (valor < 0) {
+            if (!Double.isFinite(valor) || valor < 0) {
                 throw new NumberFormatException();
             }
             return valor;
         } catch (NumberFormatException e) {
-            throw new IllegalArgumentException(nome + " deve ser um número não negativo.");
+            throw new IllegalArgumentException(nome + " deve ser um número finito não negativo.");
         }
     }
 

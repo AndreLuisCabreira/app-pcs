@@ -328,6 +328,27 @@ public class ComponentesView extends VBox {
             }
         });
 
+        javafx.collections.ObservableList<T> todos = FXCollections.observableArrayList();
+        javafx.collections.transformation.FilteredList<T> filtrados = new javafx.collections.transformation.FilteredList<>(todos);
+        list.setItems(filtrados);
+        TextField busca = UiSupport.texto("Nome, fabricante, socket, capacidade, DDR...");
+        TextField minimo = UiSupport.texto("Preço mínimo");
+        TextField maximo = UiSupport.texto("Preço máximo");
+        Label filtroErro = new Label();
+        filtroErro.setWrapText(true);
+        Runnable filtrar = () -> {
+            try {
+                double de = minimo.getText().isBlank() ? 0 : UiSupport.decimal(minimo, "Preço mínimo");
+                double ate = maximo.getText().isBlank() ? Double.MAX_VALUE : UiSupport.decimal(maximo, "Preço máximo");
+                if (de > ate) throw new IllegalArgumentException("Preço mínimo maior que o máximo.");
+                filtrados.setPredicate(item -> service.CatalogoFiltro.corresponde(item, busca.getText(), de, ate));
+                filtroErro.setText("");
+            } catch (RuntimeException e) { filtroErro.setText(e.getMessage()); }
+        };
+        busca.textProperty().addListener((o, a, b) -> filtrar.run());
+        minimo.textProperty().addListener((o, a, b) -> filtrar.run());
+        maximo.textProperty().addListener((o, a, b) -> filtrar.run());
+        HBox precos = new HBox(8, minimo, maximo);
         AtomicReference<T> itemEmEdicao = new AtomicReference<>();
         Label formTitle = new Label("Novo componente");
         formTitle.getStyleClass().add("card-title");
@@ -352,7 +373,7 @@ public class ComponentesView extends VBox {
             cancel.setManaged(false);
         };
 
-        Runnable refresh = () -> list.setItems(FXCollections.observableArrayList(carregar.get()));
+        Runnable refresh = () -> todos.setAll(carregar.get());
 
         save.setOnAction(event -> {
             T item;
@@ -378,7 +399,7 @@ public class ComponentesView extends VBox {
                 return carregar.get();
             }, itens -> {
                 sairDaEdicao.run();
-                list.setItems(FXCollections.observableArrayList(itens));
+                todos.setAll(itens);
                 UiSupport.sucesso(editando
                         ? "Componente atualizado com sucesso."
                         : "Componente adicionado ao catálogo.");
@@ -416,7 +437,7 @@ public class ComponentesView extends VBox {
             cancel.setManaged(true);
         });
 
-        VBox catalog = new VBox(10, heading("Itens cadastrados"), hint, list, edit);
+        VBox catalog = new VBox(10, heading("Itens cadastrados"), busca, precos, filtroErro, hint, list, edit);
         catalog.setPadding(new Insets(20));
         catalog.getStyleClass().add("panel-card");
         VBox.setVgrow(list, Priority.ALWAYS);

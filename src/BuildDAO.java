@@ -14,6 +14,14 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class BuildDAO {
+    private final java.util.function.Supplier<Connection> conexoes;
+
+    public BuildDAO() { this(ConnectionFactory::getConexao); }
+
+    BuildDAO(java.util.function.Supplier<Connection> conexoes) {
+        this.conexoes = java.util.Objects.requireNonNull(conexoes);
+    }
+
 
     private static final String SELECT_COMPLETO = """
             SELECT
@@ -52,7 +60,7 @@ public class BuildDAO {
                 VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
                 """;
 
-        try (Connection con = ConnectionFactory.getConexao();
+        try (Connection con = conexoes.get();
              PreparedStatement ps = con.prepareStatement(sql)) {
             preencherParametros(ps, b);
             ps.executeUpdate();
@@ -64,7 +72,7 @@ public class BuildDAO {
     public Build buscarPorId(int id) {
         String sql = SELECT_COMPLETO + " WHERE b.id = ?";
 
-        try (Connection con = ConnectionFactory.getConexao();
+        try (Connection con = conexoes.get();
              PreparedStatement ps = con.prepareStatement(sql)) {
             ps.setInt(1, id);
             try (ResultSet rs = ps.executeQuery()) {
@@ -78,7 +86,7 @@ public class BuildDAO {
     public Build buscarPorIdDoUsuario(int id, int usuarioId) {
         String sql = SELECT_COMPLETO + " WHERE b.id = ? AND b.usuario_id = ?";
 
-        try (Connection con = ConnectionFactory.getConexao();
+        try (Connection con = conexoes.get();
              PreparedStatement ps = con.prepareStatement(sql)) {
             ps.setInt(1, id);
             ps.setInt(2, usuarioId);
@@ -94,7 +102,7 @@ public class BuildDAO {
         List<Build> builds = new ArrayList<>();
         String sql = SELECT_COMPLETO + " ORDER BY b.id";
 
-        try (Connection con = ConnectionFactory.getConexao();
+        try (Connection con = conexoes.get();
              PreparedStatement ps = con.prepareStatement(sql);
              ResultSet rs = ps.executeQuery()) {
             while (rs.next()) {
@@ -110,7 +118,7 @@ public class BuildDAO {
         List<Build> builds = new ArrayList<>();
         String sql = SELECT_COMPLETO + " WHERE b.usuario_id = ? ORDER BY b.id DESC";
 
-        try (Connection con = ConnectionFactory.getConexao();
+        try (Connection con = conexoes.get();
              PreparedStatement ps = con.prepareStatement(sql)) {
             ps.setInt(1, usuarioId);
             try (ResultSet rs = ps.executeQuery()) {
@@ -132,7 +140,7 @@ public class BuildDAO {
                 WHERE id = ?
                 """;
 
-        try (Connection con = ConnectionFactory.getConexao();
+        try (Connection con = conexoes.get();
              PreparedStatement ps = con.prepareStatement(sql)) {
             preencherParametros(ps, b);
             ps.setInt(10, b.getId());
@@ -152,7 +160,7 @@ public class BuildDAO {
                 WHERE id = ? AND usuario_id = ?
                 """;
 
-        try (Connection con = ConnectionFactory.getConexao();
+        try (Connection con = conexoes.get();
              PreparedStatement ps = con.prepareStatement(sql)) {
             ps.setString(1, b.getNome());
             ps.setInt(2, b.getProcessador().getId());
@@ -175,7 +183,7 @@ public class BuildDAO {
     public void excluir(int id) {
         String sql = "DELETE FROM build WHERE id = ?";
 
-        try (Connection con = ConnectionFactory.getConexao();
+        try (Connection con = conexoes.get();
              PreparedStatement ps = con.prepareStatement(sql)) {
             ps.setInt(1, id);
             if (ps.executeUpdate() == 0) {
@@ -189,7 +197,7 @@ public class BuildDAO {
     public void excluirDoUsuario(int id, int usuarioId) {
         String sql = "DELETE FROM build WHERE id = ? AND usuario_id = ?";
 
-        try (Connection con = ConnectionFactory.getConexao();
+        try (Connection con = conexoes.get();
              PreparedStatement ps = con.prepareStatement(sql)) {
             ps.setInt(1, id);
             ps.setInt(2, usuarioId);

@@ -10,11 +10,19 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class UsuarioDAO {
+    private final java.util.function.Supplier<Connection> conexoes;
+
+    public UsuarioDAO() { this(ConnectionFactory::getConexao); }
+
+    UsuarioDAO(java.util.function.Supplier<Connection> conexoes) {
+        this.conexoes = java.util.Objects.requireNonNull(conexoes);
+    }
+
 
     public void inserir(Usuario u) {
         String sql = "INSERT INTO usuario (nome, login, senha, perfil) VALUES (?, ?, ?, ?)";
 
-        try (Connection con = ConnectionFactory.getConexao();
+        try (Connection con = conexoes.get();
              PreparedStatement ps = con.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
 
             ps.setString(1, u.getNome());
@@ -37,7 +45,7 @@ public class UsuarioDAO {
     public Usuario buscarPorLogin(String login) {
         String sql = "SELECT id, nome, login, senha, perfil FROM usuario WHERE login = ?";
 
-        try (Connection con = ConnectionFactory.getConexao();
+        try (Connection con = conexoes.get();
              PreparedStatement ps = con.prepareStatement(sql)) {
             ps.setString(1, login);
             try (ResultSet rs = ps.executeQuery()) {
@@ -54,7 +62,7 @@ public class UsuarioDAO {
     public Usuario buscarPorId(int id) {
         String sql = "SELECT * FROM usuario WHERE id = ?";
 
-        try (Connection con = ConnectionFactory.getConexao();
+        try (Connection con = conexoes.get();
              PreparedStatement ps = con.prepareStatement(sql)) {
 
             ps.setInt(1, id);
@@ -77,7 +85,7 @@ public class UsuarioDAO {
 
         String sql = "SELECT * FROM usuario";
 
-        try (Connection con = ConnectionFactory.getConexao();
+        try (Connection con = conexoes.get();
              PreparedStatement ps = con.prepareStatement(sql);
              ResultSet rs = ps.executeQuery()) {
 
@@ -93,10 +101,24 @@ public class UsuarioDAO {
         return lista;
     }
 
+    public void alterarSenha(int usuarioId, String hashAnterior, String hashNovo) {
+        String sql = "UPDATE usuario SET senha = ? WHERE id = ? AND senha = ?";
+        try (Connection con = conexoes.get(); PreparedStatement ps = con.prepareStatement(sql)) {
+            ps.setString(1, hashNovo);
+            ps.setInt(2, usuarioId);
+            ps.setString(3, hashAnterior);
+            if (ps.executeUpdate() != 1) {
+                throw new IllegalArgumentException("A senha mudou ou a conta não está disponível. Entre novamente.");
+            }
+        } catch (SQLException e) {
+            throw new DataAccessException("Não foi possível alterar a senha.", e);
+        }
+    }
+
     public boolean existeAdmin() {
         String sql = "SELECT EXISTS(SELECT 1 FROM usuario WHERE perfil = 'ADMIN')";
 
-        try (Connection con = ConnectionFactory.getConexao();
+        try (Connection con = conexoes.get();
              PreparedStatement ps = con.prepareStatement(sql);
              ResultSet rs = ps.executeQuery()) {
             return rs.next() && rs.getBoolean(1);
@@ -108,7 +130,7 @@ public class UsuarioDAO {
     public int contarUsuarios() {
         String sql = "SELECT COUNT(*) FROM usuario";
 
-        try (Connection con = ConnectionFactory.getConexao();
+        try (Connection con = conexoes.get();
              PreparedStatement ps = con.prepareStatement(sql);
              ResultSet rs = ps.executeQuery()) {
             return rs.next() ? rs.getInt(1) : 0;

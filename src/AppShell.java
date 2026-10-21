@@ -92,6 +92,7 @@ public class AppShell extends BorderPane {
             navButton("builds", "Minhas builds", () -> new BuildsView(usuario));
             navButton("analysis", "Análises", () -> new AnalisesView(usuario));
         }
+        navButton("dashboard", "Minha conta", () -> new ContaView(usuario, aoSair));
         menu.getChildren().addAll(navigation.keySet());
 
         Region spacer = new Region();
@@ -282,7 +283,7 @@ public class AppShell extends BorderPane {
     private VBox criarCarregamento() {
         ProgressIndicator indicador = new ProgressIndicator();
         indicador.setMaxSize(44, 44);
-        Label mensagem = new Label("Carregando dados do Supabase...");
+        Label mensagem = new Label("Carregando dados...");
         mensagem.getStyleClass().add("loading-title");
         VBox carregamento = new VBox(14, indicador, mensagem);
         carregamento.setAlignment(Pos.CENTER);

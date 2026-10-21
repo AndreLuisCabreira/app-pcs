@@ -109,7 +109,51 @@ public class Main {
 
     public static void main(String[] args) {
 
-        new DatabaseSchemaValidator().verificar();
+        try {
+            new DatabaseSchemaValidator().verificar();
+            Usuario usuario = entrarNoTerminal();
+            if (usuario == null) return;
+            new AutorizacaoService().exigirAdmin(usuario);
+            executarMenu();
+        } catch (RuntimeException e) {
+            System.out.println("Acesso ao terminal não autorizado: " + e.getMessage());
+        } finally {
+            ConnectionFactory.fechar();
+        }
+    }
+
+    private static Usuario entrarNoTerminal() {
+        AutenticacaoService autenticacao = new AutenticacaoService();
+        while (true) {
+            System.out.println("1 - Entrar | 2 - Criar conta | 0 - Sair");
+            int opcao = lerInteiro("Escolha: ");
+            if (opcao == 0) return null;
+            try {
+                if (opcao == 2) {
+                    cadastrarUsuario();
+                } else if (opcao == 1) {
+                    System.out.print("Login: ");
+                    String login = sc.nextLine();
+                    return autenticacao.autenticar(login, lerSenha("Senha: "));
+                }
+            } catch (RuntimeException e) {
+                System.out.println(e.getMessage());
+            }
+        }
+    }
+
+    private static String lerSenha(String mensagem) {
+        if (System.console() != null) {
+            char[] valor = System.console().readPassword("%s", mensagem);
+            if (valor == null) throw new IllegalStateException("Entrada encerrada.");
+            try { return new String(valor); }
+            finally { java.util.Arrays.fill(valor, '\0'); }
+        }
+        System.out.print(mensagem + "(entrada visível neste terminal) ");
+        return sc.nextLine();
+    }
+
+    private static void executarMenu() {
 
         int opcao;
 
@@ -189,52 +233,14 @@ public class Main {
 
     public static void cadastrarUsuario() {
 
-        Usuario usuario = new Usuario();
-
-        System.out.println("\n===== CADASTRO DE USUÁRIO =====");
-
-        String nome;
-        while (true) {
-            System.out.print("Nome: ");
-            nome = sc.nextLine().trim();
-
-            if (nome.isEmpty()) {
-                System.out.println("Erro! O nome não pode ficar vazio.");
-                continue;
-            }
-
-            if (!nome.matches("[a-zA-ZÀ-ÿ\s]+")) {
-                System.out.println("Erro! O nome deve conter apenas letras.");
-                continue;
-            }
-
-            break;
-        }
-        usuario.setNome(nome);
-
-        String login;
-        do {
-            System.out.print("Login: ");
-            login = sc.nextLine().trim();
-            if (login.isEmpty()) {
-                System.out.println("Erro! O login não pode ficar vazio.");
-            }
-        } while (login.isEmpty());
-        usuario.setLogin(login);
-
-        String senha;
-        do {
-            System.out.print("Senha: ");
-            senha = sc.nextLine().trim();
-            if (senha.isEmpty()) {
-                System.out.println("Erro! A senha não pode ficar vazia.");
-            }
-        } while (senha.isEmpty());
-        usuario.setSenha(passwordService.criarHash(senha));
-
-        usuarioDAO.inserir(usuario);
-
-        System.out.println("\nUsuário cadastrado com sucesso!");
+        System.out.print("Nome: ");
+        String nome = sc.nextLine();
+        System.out.print("Login: ");
+        String login = sc.nextLine();
+        String senha = lerSenha("Senha (mínimo 8 caracteres): ");
+        String confirmacao = lerSenha("Confirmar senha: ");
+        new AutenticacaoService().cadastrar(nome, login, senha, confirmacao);
+        System.out.println("Conta cadastrada. Entre para continuar.");
     }
 
     public static void cadastrarComponente(){

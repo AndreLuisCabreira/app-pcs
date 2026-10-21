@@ -558,3 +558,22 @@
 .recommendation-performance {
     -fx-text-fill: #63dcb0;
 }
+
+/* Guided PC assembly */
+.montagem-title, .montagem-total { -fx-text-fill: #f2f2f2; }
+.montagem-step { -fx-background-color: #242424; -fx-text-fill: #a0a0a0; }
+.montagem-step-active { -fx-background-color: #ff512f; -fx-text-fill: white; }
+.montagem-step-done { -fx-background-color: #322019; -fx-text-fill: #ff9a73; }
+.montagem-progress .bar { -fx-background-color: #ff512f; }
+.montagem-progress .track { -fx-background-color: #303030; }
+.montagem-notice { -fx-background-color: #332818; -fx-text-fill: #ffce8b; }
+.montagem-selected, .montagem-price { -fx-text-fill: #ff9a73; }
+.montagem-list .list-cell { -fx-background-color: #1b1b1b; }
+.montagem-list .list-cell:empty { -fx-background-color: transparent; }
+.montagem-list .list-cell:selected { -fx-background-color: #322019; -fx-border-color: #ff512f; }
+.montagem-list .list-cell:filled:hover { -fx-border-color: #ff512f; }
+.montagem-item-name, .montagem-review-name { -fx-text-fill: #eeeeee; }
+.montagem-summary { -fx-background-color: #191919; }
+.montagem-summary-item { -fx-text-fill: #cccccc; }
+.montagem-summary-item:hover { -fx-background-color: #292929; }
+.montagem-review-row { -fx-background-color: #1b1b1b; }

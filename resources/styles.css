@@ -922,3 +922,26 @@
     -fx-font-size: 24px;
     -fx-font-weight: 800;
 }
+
+/* Guided PC assembly */
+.montagem-title { -fx-font-size: 21px; -fx-font-weight: 800; -fx-text-fill: #182238; }
+.montagem-step { -fx-background-color: #e9edf5; -fx-text-fill: #68748a; -fx-padding: 8 11; -fx-font-size: 11px; }
+.montagem-step-active { -fx-background-color: #ff7a45; -fx-text-fill: white; }
+.montagem-step-done { -fx-background-color: #fff0e8; -fx-text-fill: #b95025; }
+.montagem-progress { -fx-pref-height: 5; }
+.montagem-progress .bar { -fx-background-color: #ff7a45; -fx-background-insets: 0; -fx-padding: 3; }
+.montagem-progress .track { -fx-background-color: #e4e8f0; -fx-background-insets: 0; }
+.montagem-notice { -fx-background-color: #fff0df; -fx-text-fill: #80521f; -fx-padding: 9 12; -fx-background-radius: 7; }
+.montagem-selected { -fx-font-size: 12px; -fx-text-fill: #b95025; }
+.montagem-list { -fx-background-color: transparent; -fx-border-color: transparent; -fx-padding: 0; }
+.montagem-list .list-cell { -fx-background-color: #f8f9fc; -fx-background-insets: 4 0; -fx-background-radius: 9; -fx-padding: 16 12; -fx-border-color: transparent; -fx-border-insets: 4 0; -fx-border-radius: 9; }
+.montagem-list .list-cell:empty { -fx-background-color: transparent; }
+.montagem-list .list-cell:selected { -fx-background-color: #fff0e8; -fx-border-color: #ff7a45; }
+.montagem-list .list-cell:filled:hover { -fx-border-color: #ff7a45; }
+.montagem-item-name, .montagem-review-name { -fx-font-size: 13px; -fx-font-weight: 700; -fx-text-fill: #243047; }
+.montagem-price { -fx-font-weight: 800; -fx-font-size: 14px; -fx-text-fill: #b95025; }
+.montagem-summary { -fx-background-color: #eef1f8; -fx-background-radius: 12; }
+.montagem-total { -fx-font-size: 22px; -fx-font-weight: 800; -fx-text-fill: #182238; }
+.montagem-summary-item { -fx-background-color: transparent; -fx-text-fill: #3b465b; -fx-font-size: 11px; -fx-padding: 10 6; }
+.montagem-summary-item:hover { -fx-background-color: #e1e6f0; }
+.montagem-review-row { -fx-padding: 12; -fx-background-color: #f8f9fc; -fx-background-radius: 9; }

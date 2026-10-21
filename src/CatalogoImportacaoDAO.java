@@ -14,11 +14,19 @@ import java.sql.SQLException;
 import java.sql.Statement;
 
 public class CatalogoImportacaoDAO {
+    private final java.util.function.Supplier<Connection> conexoes;
+
+    public CatalogoImportacaoDAO() { this(ConnectionFactory::getConexao); }
+
+    CatalogoImportacaoDAO(java.util.function.Supplier<Connection> conexoes) {
+        this.conexoes = java.util.Objects.requireNonNull(conexoes);
+    }
+
 
     private static final String ORIGEM = "PC_PART_DATASET";
 
     public int importar(TipoComponenteCatalogo tipo, ProdutoCatalogo produto, Componente componente) {
-        try (Connection connection = ConnectionFactory.getConexao()) {
+        try (Connection connection = conexoes.get()) {
             connection.setAutoCommit(false);
             try {
                 if (jaImportado(connection, tipo, produto.getIdExterno())) {

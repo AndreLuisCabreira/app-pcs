@@ -1,251 +1,113 @@
 # PC Builder — IntraTech
 
-Aplicação desktop em JavaFX para cadastrar componentes, montar computadores, verificar compatibilidade e comparar custo, consumo e benchmarks de jogos.
+Aplicação desktop em JavaFX para cadastrar componentes, montar computadores, verificar compatibilidade e comparar preço, consumo e benchmarks de jogos. Projeto educacional voltado à montagem e comparação de PCs; objetivos comerciais não foram definidos.
 
 ## Funcionalidades
 
-- login e cadastro de contas com senha protegida por PBKDF2;
-- dashboard individual com as builds e favoritas da conta autenticada;
-- catálogo de processadores, placas-mãe, placas de vídeo, memórias, SSDs e fontes;
-- criação, edição e exclusão de builds isoladas por usuário;
-- filtragem de placa-mãe por socket e de memória por geração DDR;
-- validação de socket, memória e capacidade da fonte;
-- cálculo do preço e consumo total;
-- análise de FPS baseada em medições reais por jogo, resolução e qualidade;
-- galeria de jogos com recomendações de configuração para 1080p a 60 FPS;
-- cadastro administrativo de jogos e benchmarks com FPS médio, 1% low e fonte;
-- listagem e importação administrativa pelo dataset público `docyx/pc-part-dataset`;
-- persistência em Supabase/PostgreSQL, MariaDB ou MySQL com consultas parametrizadas.
+- Login e cadastro com senhas protegidas por PBKDF2; troca de senha com confirmação da senha atual.
+- Dashboard, builds e favoritas vinculados à conta na interface gráfica.
+- Catálogo de CPU, placa-mãe, GPU, memória, SSD e fonte, com manutenção administrativa.
+- Montagem guiada, uma peça por etapa, com retorno, resumo de preço e revisão; edição e exclusão de builds, filtros de socket/DDR e validação de fonte.
+- Cálculo de preço e consumo, com análise de FPS por medições cadastradas.
+- Comparação de duas ou três builds próprias e exportação em TXT ou HTML imprimível em PDF.
+- Filtros de catálogo por termos e faixa de preço; recomendações por orçamento, resolução e FPS.
+- Backup completo dos dados e restauração transacional por administrador, com confirmação da senha atual.
+- Galeria de jogos com busca por nome/gênero, capas e recomendações para 1080p/60 FPS.
+- Cadastro administrativo de jogos e benchmarks, incluindo fonte e 1% low opcional.
+- Importação revisada de CPU, GPU, fonte, memória e SSD do dataset público `docyx/pc-part-dataset`.
+- Persistência JDBC em PostgreSQL/Supabase ou MariaDB/MySQL.
 
-## Limitações conhecidas
+## Tecnologias e estrutura
 
-- preços são cadastrados manualmente e não são cotações em tempo real;
-- os preços do dataset estão em dólar, foram atualizados em julho de 2025 e não são cotações atuais;
-- CPU não traz socket/threads, GPU não traz consumo e SSD não traz leitura/escrita;
-- a referência de FPS depende da quantidade e da qualidade dos benchmarks cadastrados;
-- ainda não há recuperação de senha;
-- a compatibilidade não cobre dimensões físicas, BIOS, conectores ou lanes PCIe.
+Java 21, JavaFX 21.0.8, Maven, HikariCP, Jackson, drivers PostgreSQL/MySQL e JUnit 5. As versões completas são mantidas no [pom.xml](pom.xml).
 
-## Tecnologias
+| Caminho | Responsabilidade |
+| --- | --- |
+| `src/DesktopLauncher.java` e `src/DesktopApp.java` | Inicialização gráfica |
+| `src/*View.java` e `src/AppShell.java` | Telas e navegação |
+| `src/*DAO.java` e `src/ConnectionFactory.java` | Persistência JDBC |
+| `src/model`, `src/service`, `src/ui` | Domínio, serviços e utilitários de interface |
+| `src/Main.java` | Terminal administrativo autenticado, com operações globais |
+| `resources` | CSS, imagens e recursos |
+| `test` | Testes unitários |
+| `database` | Schemas dos dois bancos |
+| `scripts` | Compilação, testes, diagnósticos, atualização e empacotamento |
+| `figma-html` | Protótipo visual independente, sem persistência |
 
-- Java 21;
-- JavaFX 21;
-- Maven 3.9+;
-- Supabase/PostgreSQL, MariaDB ou MySQL;
-- JDBC / pgJDBC e MySQL Connector/J;
-- HikariCP para reutilização eficiente das conexões remotas;
-- Jackson 2.21;
-- JUnit 5.
+Há classes no pacote padrão e diretórios personalizados no Maven. Veja [arquitetura](docs/ARCHITECTURE.md).
 
-## Estrutura
+## Começar
 
-```text
-src/
-├── DesktopLauncher.java       ponto de entrada da interface
-├── DesktopApp.java            configuração da janela JavaFX
-├── AutenticacaoView.java      tela de login e criação de conta
-├── AutenticacaoService.java   validação de credenciais e cadastro
-├── Main.java                  interface de terminal mantida como alternativa
-├── *View.java                 telas da aplicação JavaFX
-├── AppShell.java              navegação e estrutura visual
-├── ui/                        recursos de marca e utilitários visuais
-├── *DAO.java                  persistência JDBC
-├── ConnectionFactory.java     configuração e abertura da conexão
-├── DatabaseSchemaValidator.java verificação somente leitura na abertura
-├── DatabaseMigrationLauncher.java comando administrativo de migration
-├── model/                     entidades do domínio
-└── service/                   compatibilidade, consumo, FPS e senhas
-resources/styles.css           tema da aplicação
-test/                          testes unitários
-database/schema.sql            tabelas, jogos e estrutura de benchmarks
-database/supabase.sql          esquema PostgreSQL para o SQL Editor
-scripts/migrate-database.ps1   atualização explícita de bancos existentes
-```
+Use JDK 21 e Maven 3.9+ conforme a orientação do projeto. Abra a pasta que contém `pom.xml`.
 
-O projeto usa uma separação simples entre interface, modelos, DAOs e serviços. As classes ainda estão no pacote padrão para preservar compatibilidade com a base acadêmica original.
-
-## Configuração inicial
-
-### Supabase
-
-Para usar o banco em nuvem, siga o guia [SUPABASE.md](SUPABASE.md) e execute
-[`database/supabase.sql`](database/supabase.sql) no SQL Editor. A aplicação usa
-a conexão PostgreSQL do **Session pooler**; as API keys do Supabase não são
-gravadas no aplicativo.
-
-### 1. Pré-requisitos
-
-Confirme as versões instaladas:
-
-```powershell
-java -version
-mvn -version
-mysql --version
-```
-
-Use Java 21 ou superior.
-
-### 2. Criar o banco
-
-Execute [`database/schema.sql`](database/schema.sql) no HeidiSQL ou no cliente de sua preferência.
-
-Em um ambiente real, crie um usuário exclusivo para a aplicação:
-
-```sql
-CREATE USER 'pcbuilder'@'localhost' IDENTIFIED BY 'uma-senha-forte';
-GRANT SELECT, INSERT, UPDATE, DELETE, CREATE ON pcbuilder.* TO 'pcbuilder'@'localhost';
-FLUSH PRIVILEGES;
-```
-
-### 3. Configurar o banco
-
-No PowerShell, para a sessão atual:
-
-```powershell
-$env:DB_URL = 'jdbc:mysql://localhost:3306/pcbuilder?useSSL=false&serverTimezone=UTC'
-$env:DB_USER = 'pcbuilder'
-$env:DB_PASSWORD = 'uma-senha-forte'
-$env:DB_ALLOW_EMPTY_PASSWORD = 'false'
-```
-
-Para o MariaDB local descrito no projeto, com `root` sem senha:
-
-```powershell
-$env:DB_USER = 'root'
-$env:DB_PASSWORD = ''
-$env:DB_ALLOW_EMPTY_PASSWORD = 'true'
-```
-
-O aplicativo lê primeiro `.env.local` da raiz do projeto (ou `.env` como alternativa), mantendo as variáveis do sistema como prioridade. A configuração de execução do VS Code já define as variáveis do banco para o ambiente local. Não envie `.env.local` nem `.env` para o Git; ambos estão ignorados pelo projeto.
-
-### 4. Preparar ou atualizar a estrutura
-
-Em um banco novo, execute `database/schema.sql` no MariaDB/MySQL ou
-`database/supabase.sql` no SQL Editor do Supabase.
-
-Ao atualizar uma instalação existente, execute uma vez:
-
-```powershell
-powershell -ExecutionPolicy Bypass -File .\scripts\migrate-database.ps1
-powershell -ExecutionPolicy Bypass -File .\scripts\check-database.ps1
-```
-
-Esse é um procedimento administrativo. A abertura normal do PC Builder apenas
-verifica a estrutura, sem executar `CREATE`, `ALTER` ou atualizações de
-manutenção. Se algo estiver ausente, o aplicativo informa que a migration deve
-ser executada e não abre uma sessão sobre um esquema incompleto.
-
-## Executar
-
-### Build portátil para outro PC
-
-Para gerar uma versão Windows 64 bits com Java e JavaFX incluídos:
-
-```powershell
-powershell -ExecutionPolicy Bypass -File .\scripts\package-windows.ps1
-```
-
-O ZIP será criado em `dist\IntraTech-PC-Builder-1.8.1-windows-x64.zip`. O arquivo `.env` real não é incluído. Consulte [DISTRIBUICAO.md](DISTRIBUICAO.md) para configurar e executar o aplicativo no computador de destino.
-
-### VS Code
-
-1. Abra a pasta `projeto` ou `Montagem-PCs`.
-2. Pressione `F5`.
-3. Selecione **Executar PC Builder (configuração .env.local)**.
-
-Abra a pasta que contém `pom.xml` e `.env.local`. Instale as extensões Java do VS Code, configure JDK 21 ou superior e aguarde a importação do projeto Maven. A execução inicia `DesktopLauncher` na raiz do projeto. Pelo terminal, use `mvn javafx:run`.
-
-Na primeira execução de um banco vazio, use a aba **Criar conta**. A primeira conta recebe o perfil de administrador. Depois do login, a aplicação mostra somente as builds e favoritas vinculadas àquela conta.
-
-### Importar componentes
-
-Somente administradores veem a opção **Importar catálogo**:
-
-1. escolha CPU, GPU, fonte, RAM ou SSD;
-2. aguarde o carregamento direto da lista pública;
-3. filtre localmente por nome, fabricante ou especificação;
-4. selecione um resultado;
-5. revise todos os campos técnicos;
-6. informe o preço local em reais;
-7. clique em **Importar componente**.
-
-A categoria é baixada de `raw.githubusercontent.com` em segundo plano e mantida em memória enquanto o programa estiver aberto. Não há chave, cadastro ou URL para configurar. O componente só é salvo após revisão e permanece disponível sem internet. A tabela `componente_importado` registra a origem e impede a importação repetida do mesmo item na mesma categoria.
-
-### Maven
-
-Com as variáveis de banco definidas:
+1. Prepare **um** banco: [Supabase/PostgreSQL](SUPABASE.md) ou [schema MariaDB/MySQL](database/schema.sql).
+2. Se ainda não possuir configuração, copie [.env.example](.env.example) para `.env.local` e preencha os valores. Preserve configurações locais já existentes.
+3. Execute:
 
 ```powershell
 mvn clean test
 mvn javafx:run
 ```
 
-Também é possível iniciar com:
+O primeiro comando compila e testa; o segundo abre a aplicação e precisa do banco. Na primeira conta gráfica de uma base vazia, o perfil é administrador. Depois do login, a interface lista as builds e favoritas da conta.
 
-```powershell
-mvn exec:java
-```
+Configuração, precedência de variáveis, VS Code, comandos alternativos, terminal e scripts Windows estão em [DEVELOPMENT.md](docs/DEVELOPMENT.md). A configuração de F5 incluída no ZIP inicia `DesktopLauncher`; o carregador Java lê o arquivo de ambiente. Não há variáveis de banco declaradas no `launch.json`.
 
-Para usar a interface antiga de terminal:
+Para banco existente, consulte o ciclo de atualização em [DATA_MODEL.md](docs/DATA_MODEL.md) e faça backup antes de mudanças. A abertura normal apenas verifica parte do esquema; não executa migrations automaticamente.
 
-```powershell
-mvn exec:java -Dexec.mainClass=Main
-```
+## Montar seu PC
 
-## Regras de negócio
+Em **Minhas builds → + Montar novo PC**, escolha processador, placa-mãe, memória, placa de vídeo, SSD e fonte, nessa ordem. A sétima etapa revisa as peças, o nome e a opção de favorita antes de salvar. Cada etapa tem busca e mostra apenas sua categoria; placa-mãe, memória e fonte respeitam as escolhas anteriores.
 
-### Compatibilidade
+Use **Voltar**, as etapas no topo ou o resumo lateral para rever peças. Trocas preservam as demais escolhas compatíveis; uma placa-mãe/memória incompatível ou fonte insuficiente é removida com aviso para nova seleção. Alternar entre as duas abas mantém o rascunho enquanto a tela estiver aberta. **Editar selecionada** abre uma build salva para revisão e troca de componentes, preservando sua identidade. Não é preciso alterar o banco para usar esse fluxo.
 
-- socket da CPU deve ser igual ao socket da placa-mãe;
-- tipo da RAM deve ser igual ao tipo aceito pela placa-mãe;
-- potência da fonte deve ser igual ou superior ao consumo recomendado.
+## Importar componentes
 
-### Consumo
+Na interface gráfica, somente administradores veem **Importar catálogo**:
 
-```text
-consumo = CPU + placa-mãe + GPU + 5 W da memória + 5 W do SSD
-fonte recomendada = teto(consumo × 1,20)
-```
+1. Escolha CPU, GPU, fonte, RAM ou SSD e aguarde a lista pública.
+2. Filtre por nome, fabricante ou especificação e selecione um resultado.
+3. Revise os campos técnicos, complete os ausentes e informe o preço local em reais.
+4. Clique em **Importar componente**.
 
-### FPS
+O cliente baixa JSON do GitHub sem API key e oferece cache por instância e atualização manual. A importação é transacional e registra a origem para impedir duplicidade por categoria/origem/ID. Peças importadas ficam no banco, independentemente de uma nova consulta ao dataset.
 
-O sistema não transforma índices arbitrários em FPS. A análise procura medições cadastradas para o mesmo jogo, resolução e qualidade:
+## Limitações e segurança
 
-- com a mesma CPU e GPU, mostra a média das medições exatas;
-- sem a mesma CPU, usa medições da mesma GPU com o processador de índice mais próximo e identifica o resultado como **referência próxima**;
-- sem medição da mesma GPU, mostra **Sem dados** em vez de inventar um valor.
+Preços são cadastrados manualmente, sem cotação em tempo real. O README anterior informa preços externos em USD com referência de julho de 2025; a atualidade do dataset não foi validada nesta entrega. Alguns campos técnicos precisam ser preenchidos manualmente. FPS depende da quantidade e qualidade dos benchmarks; não é medição do computador em uso. Compatibilidade não cobre dimensões, BIOS, conectores ou lanes PCIe.
 
-O administrador cadastra essas medições na tela **Benchmarks**, informando jogo, componentes testados, resolução, qualidade, FPS médio, 1% low opcional e a fonte. Para comparações coerentes, registre se o teste usou ray tracing ou upscaling no campo de observações.
+O login é próprio da aplicação. O desktop recebe credenciais JDBC, e o terminal agora exige login de administrador para permitir suas operações globais. Não interpretar os filtros da interface como garantia de isolamento contra quem possui a credencial do banco. Limitações, controles de senha, RLS e dados pessoais estão em [SECURITY.md](docs/SECURITY.md).
 
-Na tela **Jogos**, cada card abre a configuração completa de menor custo que utiliza uma medição real de pelo menos 60 FPS em 1920×1080. CPU e GPU vêm do benchmark; placa-mãe, memória, SSD e fonte são completados com peças compatíveis do catálogo. Jogos sem medição adequada exibem **Sem dados**, sem estimar FPS artificialmente. O cadastro administrativo aceita gênero, descrição e uma URL pública opcional de capa; sem imagem, a interface usa um monograma automático.
+Não há recuperação de senha esquecida implementada. A troca com senha atual está em **Minha conta**. Senhas antigas em texto puro não são aceitas pelo verificador atual. A orientação anterior era criar nova conta antes de remover registros legados; isso precisa considerar propriedade de builds e privilégios, sem exclusão automática de dados. Há outras pendências em [TECH_DEBT.md](docs/TECH_DEBT.md).
 
-## Segurança
+## Distribuição
 
-- credenciais não ficam no código-fonte;
-- senha vazia exige `DB_ALLOW_EMPTY_PASSWORD=true`;
-- senhas cadastradas usam PBKDF2-HMAC-SHA-256 com salt aleatório;
-- o hash da senha não permanece no objeto de sessão;
-- mensagens de login inválido não revelam se a conta existe;
-- consultas de builds na interface exigem o ID do usuário autenticado;
-- comandos SQL usam `PreparedStatement`;
-- a importação usa transação e bloqueia itens duplicados por categoria.
+Para gerar o pacote portátil Windows x64, consulte os pré-requisitos e comandos de [DISTRIBUICAO.md](DISTRIBUICAO.md). A saída prevista pelo script é `dist/IntraTech-PC-Builder-1.8.1-windows-x64.zip`, com Java incluído. Este ZIP de projeto fonte não é o executável portátil. Preserve sua configuração privada e não publique cópias configuradas.
 
-Contas muito antigas que tenham senha salva em texto puro não são aceitas pelo login. Crie uma nova conta pela tela de cadastro antes de remover esses registros antigos.
+## Documentação
 
-## Testes
+| Assunto | Fonte principal |
+| --- | --- |
+| Instalação, configuração e execução | [Desenvolvimento](docs/DEVELOPMENT.md) |
+| Componentes e integrações | [Arquitetura](docs/ARCHITECTURE.md) |
+| Funcionalidades, critérios e fórmulas | [Requisitos e regras](docs/REQUIREMENTS.md) |
+| Tabelas, restrições e atualização | [Modelo de dados](docs/DATA_MODEL.md) |
+| Acesso ao PostgreSQL/Supabase | [Guia Supabase](SUPABASE.md) |
+| Controles e limitações de acesso | [Segurança](docs/SECURITY.md) |
+| Execução e lacunas de testes | [Testes](docs/TESTING.md) |
+| Cópias e restauração | [Backup e recuperação](docs/BACKUP_AND_RECOVERY.md) |
+| Problemas conhecidos e decisões pendentes | [Débitos técnicos](docs/TECH_DEBT.md) |
+| Trabalho de agentes e critérios de conclusão | [AGENTS.md](AGENTS.md) |
+| Evolução do projeto | [Changelog](CHANGELOG.md) |
+| Registro histórico de catálogo e janela | [Atualizações do catálogo](ATUALIZACOES-CATALOGO.md) |
+| Protótipo HTML/CSS | [Guia do protótipo](figma-html/README.md) |
 
-Os testes unitários cobrem autenticação, perfis, proteção de senha, compatibilidade, builds incompletas, consumo, potência recomendada, seleção de benchmarks e preço total. Testes de integração dos DAOs com banco descartável continuam no roadmap.
+## Testes e roadmap
 
-## Roadmap
+Foram executados 64 testes com JDK 21/JUnit, incluindo integração JDBC em H2 descartável e dez testes do estado da montagem guiada. O assistente foi exercitado em JavaFX headless e conferido nos temas claro/escuro e na largura mínima da janela. A verificação anterior do schema e dos comandos RLS usou PostgreSQL WASM/PGlite. Isso não substitui validação no Windows nem testes contra seu Supabase. O guia de [testes](docs/TESTING.md) registra detalhes e limites. Consulte [MELHORIAS.md](MELHORIAS.md) para localizar os recursos novos.
 
-- recuperação e alteração de senha;
-- migrations versionadas;
-- testes de integração com banco descartável;
-- compatibilidade física e de BIOS;
-- importação automatizada de benchmarks com revisão da fonte;
-- importação de preços com fonte e data visíveis;
-- recomendações por orçamento e perfil de uso.
+Evoluções pendentes: recuperação de senha esquecida, migrations versionadas, testes nativos PostgreSQL/MariaDB, compatibilidade física/BIOS, importação revisada de benchmarks, preços com fonte/data e recomendação por perfil de uso. O orçamento já filtra as configurações elegíveis por jogo; as preferências de peças do algoritmo permanecem documentadas nos requisitos.
 
 ## Licença
 
-Projeto educacional. Antes de redistribuir, adicione um arquivo de licença explícito ao repositório.
+Projeto educacional, sem arquivo de licença explícito no pacote. O mantenedor deve definir a licença do código e avaliar direitos dos recursos antes de redistribuir publicamente.

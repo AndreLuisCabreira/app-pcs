@@ -53,6 +53,21 @@ public class AutenticacaoService {
         return usuario;
     }
 
+    public void alterarSenha(Usuario sessao, String senhaAtual, String novaSenha, String confirmacao) {
+        if (sessao == null || sessao.getId() <= 0) {
+            throw new SecurityException("Entre na conta para alterar a senha.");
+        }
+        validarNovaSenha(novaSenha, confirmacao);
+        Usuario armazenado = usuarioDAO.buscarPorId(sessao.getId());
+        if (armazenado == null || !passwordService.verificar(senhaAtual, armazenado.getSenha())) {
+            throw new IllegalArgumentException("Senha atual inválida.");
+        }
+        if (senhaAtual.equals(novaSenha)) {
+            throw new IllegalArgumentException("Escolha uma senha diferente da atual.");
+        }
+        usuarioDAO.alterarSenha(sessao.getId(), armazenado.getSenha(), passwordService.criarHash(novaSenha));
+    }
+
     private String exigirNome(String nome) {
         String valor = nome == null ? "" : nome.trim();
         if (valor.length() < 2) {

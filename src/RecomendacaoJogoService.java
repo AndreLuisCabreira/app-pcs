@@ -23,6 +23,10 @@ public class RecomendacaoJogoService {
     public static final int FPS_ALVO = 60;
 
     public List<RecomendacaoJogo> listar() {
+        return listar(RESOLUCAO_ALVO, FPS_ALVO, Double.MAX_VALUE);
+    }
+
+    public List<RecomendacaoJogo> listar(String resolucao, int fpsMinimo, double orcamento) {
         return recomendar(
                 new JogoDAO().listar(),
                 new BenchmarkFPSDAO().listar(),
@@ -31,7 +35,7 @@ public class RecomendacaoJogoService {
                 new PlacaMaeDAO().listar(),
                 new MemoriaDAO().listar(),
                 new SSDDAO().listar(),
-                new FonteDAO().listar()
+                new FonteDAO().listar(), resolucao, fpsMinimo, orcamento
         );
     }
 
@@ -45,6 +49,18 @@ public class RecomendacaoJogoService {
             List<SSD> ssds,
             List<Fonte> fontes
     ) {
+        return recomendar(jogos, benchmarks, processadores, placasVideo, placasMae, memorias,
+                ssds, fontes, RESOLUCAO_ALVO, FPS_ALVO, Double.MAX_VALUE);
+    }
+
+    public List<RecomendacaoJogo> recomendar(
+            List<Jogo> jogos, List<BenchmarkFPS> benchmarks, List<Processador> processadores,
+            List<PlacaVideo> placasVideo, List<PlacaMae> placasMae, List<Memoria> memorias,
+            List<SSD> ssds, List<Fonte> fontes, String resolucao, int fpsMinimo, double orcamento) {
+        if (resolucao == null || resolucao.isBlank() || fpsMinimo <= 0
+                || !Double.isFinite(orcamento) || orcamento <= 0) {
+            throw new IllegalArgumentException("Informe resolução, FPS e orçamento válidos.");
+        }
         Map<Integer, Processador> cpuPorId = processadores.stream()
                 .collect(Collectors.toMap(Processador::getId, Function.identity()));
         Map<Integer, PlacaVideo> gpuPorId = placasVideo.stream()
@@ -54,12 +70,13 @@ public class RecomendacaoJogoService {
         for (Jogo jogo : jogos) {
             RecomendacaoJogo melhor = benchmarks.stream()
                     .filter(item -> item.getJogoId() == jogo.getId())
-                    .filter(item -> RESOLUCAO_ALVO.equalsIgnoreCase(item.getResolucao()))
-                    .filter(item -> item.getFpsMedio() >= FPS_ALVO)
+                    .filter(item -> resolucao.equalsIgnoreCase(item.getResolucao()))
+                    .filter(item -> item.getFpsMedio() >= fpsMinimo)
                     .map(item -> criarRecomendacao(
                             jogo, item, cpuPorId, gpuPorId, placasMae, memorias, ssds, fontes
                     ))
                     .filter(RecomendacaoJogo::disponivel)
+                    .filter(item -> item.build().getPrecoTotal() <= orcamento)
                     .min(Comparator
                             .comparingDouble((RecomendacaoJogo item) -> item.build().getPrecoTotal())
                             .thenComparingInt(item -> -nivelQualidade(item.benchmark().getQualidade()))

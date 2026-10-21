@@ -39,7 +39,10 @@ function Find-PackagingJdk {
         $jpackage = Get-ChildItem -LiteralPath $candidate -Recurse -Filter 'jpackage.exe' -ErrorAction SilentlyContinue |
             Select-Object -First 1 -ExpandProperty FullName
         if ($jpackage) {
-            return Split-Path -Parent (Split-Path -Parent $jpackage)
+            $candidateHome = Split-Path -Parent (Split-Path -Parent $jpackage)
+            $javaExecutable = Join-Path $candidateHome 'bin\java.exe'
+            $version = (& $javaExecutable -version 2>&1 | Out-String)
+            if ($version -match 'version "(\d+)' -and [int]$Matches[1] -ge 21) { return $candidateHome }
         }
     }
     return $null
@@ -67,6 +70,7 @@ if (-not (Test-Path -LiteralPath $jar) -or -not (Test-Path -LiteralPath $jpackag
     throw "O JDK selecionado não contém jar.exe e jpackage.exe: $jdkHome"
 }
 
+$env:JAVA_HOME = $jdkHome
 Write-Host '1/5 Compilando a aplicação...'
 & (Join-Path $PSScriptRoot 'compile.ps1')
 

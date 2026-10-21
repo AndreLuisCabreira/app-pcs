@@ -26,7 +26,7 @@ class AutorizacaoServiceTest {
                 () -> service.exigirAdmin(usuario)
         );
 
-        assertEquals("Somente administradores podem adicionar componentes.", erro.getMessage());
+        assertEquals("Esta operação exige uma conta administradora.", erro.getMessage());
     }
 
     @Test

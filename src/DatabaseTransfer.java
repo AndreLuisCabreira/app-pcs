@@ -21,10 +21,18 @@ public final class DatabaseTransfer {
         TABELAS.put("memoria", colunas("id,nome,capacidade,frequencia,tipo,preco"));
         TABELAS.put("ssd", colunas("id,nome,capacidade,leitura,escrita,tipo,preco"));
         TABELAS.put("fonte", colunas("id,nome,potencia,certificacao,preco"));
-        TABELAS.put("jogo", colunas("id,nome,exigencia_cpu,exigencia_gpu"));
+        TABELAS.put("jogo", colunas("id,nome,exigencia_cpu,exigencia_gpu,genero,descricao,imagem_url"));
         TABELAS.put("build", colunas("id,nome,usuario_id,processador_id,placa_mae_id,placa_video_id,memoria_id,ssd_id,fonte_id,favorita"));
         TABELAS.put("benchmark_fps", colunas("id,jogo_id,processador_id,placa_video_id,resolucao,qualidade,fps_medio,fps_1_low,fonte,observacoes,criado_em"));
         TABELAS.put("componente_importado", colunas("id,tipo,componente_id,origem,id_externo,nome_original,importado_em"));
+    }
+
+    static java.util.List<String> tabelas() { return java.util.List.copyOf(TABELAS.keySet()); }
+
+    static String[] colunasDaTabela(String tabela) {
+        String[] colunas = TABELAS.get(tabela);
+        if (colunas == null) throw new IllegalArgumentException("Tabela desconhecida.");
+        return colunas.clone();
     }
 
     private DatabaseTransfer() {
@@ -108,7 +116,7 @@ public final class DatabaseTransfer {
         }
     }
 
-    private static void copiarTabela(
+    static void copiarTabela(
             Connection source,
             Connection target,
             String tabela,

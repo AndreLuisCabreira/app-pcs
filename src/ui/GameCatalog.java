@@ -98,7 +98,7 @@ public final class GameCatalog extends VBox {
         performance.getStyleClass().add(recommendation.disponivel()
                 ? "game-status-ready" : "game-status-missing");
         Label resolution = new Label(recommendation.disponivel()
-                ? "1080p • Configuração recomendada" : "Sem configuração com medição ≥ 60 FPS");
+                ? recommendation.benchmark().getResolucao() + " • Configuração recomendada" : "Sem configuração para os filtros selecionados");
         resolution.setWrapText(true);
         resolution.getStyleClass().add("game-card-resolution");
         Label description = new Label(value(game.getDescricao(), value(game.getGenero(),

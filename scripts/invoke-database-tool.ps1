@@ -11,17 +11,8 @@ $userProfileDirectory = [Environment]::GetFolderPath('UserProfile')
 
 & (Join-Path $PSScriptRoot 'compile.ps1')
 
-$javaExtension = Get-ChildItem -LiteralPath (Join-Path $userProfileDirectory '.vscode\extensions') -Directory |
-    Where-Object { $_.Name -like 'redhat.java-*-win32-x64' } |
-    Sort-Object Name -Descending |
-    Select-Object -First 1
-
-if ($null -eq $javaExtension) {
-    throw 'A extensão Java do VS Code não foi encontrada.'
-}
-
-$java = Get-ChildItem -LiteralPath $javaExtension.FullName -Recurse -Filter 'java.exe' |
-    Select-Object -First 1 -ExpandProperty FullName
+. (Join-Path $PSScriptRoot 'java-tools.ps1')
+$java = Join-Path (Get-IntraTechJdk) 'bin\java.exe'
 $postgresDriver = Get-ChildItem -LiteralPath (Join-Path $userProfileDirectory '.m2\repository\org\postgresql\postgresql') `
     -Recurse -Filter 'postgresql-42.7.13.jar' -ErrorAction SilentlyContinue |
     Select-Object -First 1 -ExpandProperty FullName

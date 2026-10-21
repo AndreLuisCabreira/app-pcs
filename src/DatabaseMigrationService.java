@@ -8,6 +8,16 @@ public class DatabaseMigrationService {
 
     public void aplicar() {
         try (Connection connection = ConnectionFactory.getConexao()) {
+            aplicar(connection);
+        } catch (SQLException e) {
+            throw new DataAccessException("Não foi possível atualizar a estrutura do banco de dados.", e);
+        }
+    }
+
+    void aplicar(Connection connection) throws SQLException {
+        boolean transacao = isPostgreSQL(connection) && connection.getAutoCommit();
+        if (transacao) connection.setAutoCommit(false);
+        try {
             if (!colunaPerfilExiste(connection)) {
                 try (Statement statement = connection.createStatement()) {
                     statement.executeUpdate("""
@@ -30,9 +40,18 @@ public class DatabaseMigrationService {
             adicionarColunaSeAusente(connection, "jogo", "descricao", "VARCHAR(500) NULL");
             adicionarColunaSeAusente(connection, "jogo", "imagem_url", "VARCHAR(1000) NULL");
             criarIndiceRecomendacoes(connection);
-        } catch (SQLException e) {
-            throw new DataAccessException("Não foi possível atualizar a estrutura do banco de dados.", e);
+            if (isPostgreSQL(connection)) new DatabaseSecurityService().aplicar(connection);
+            if (transacao) connection.commit();
+        } catch (SQLException | RuntimeException e) {
+            if (transacao) connection.rollback();
+            throw e;
+        } finally {
+            if (transacao) connection.setAutoCommit(true);
         }
+    }
+
+    private boolean isPostgreSQL(Connection connection) throws SQLException {
+        return connection.getMetaData().getDatabaseProductName().toLowerCase(java.util.Locale.ROOT).contains("postgresql");
     }
 
     private void criarTabelaBenchmarks(Connection connection) throws SQLException {
@@ -114,7 +133,7 @@ public class DatabaseMigrationService {
         DatabaseMetaData metadata = connection.getMetaData();
         try (ResultSet indices = metadata.getIndexInfo(
                 connection.getCatalog(),
-                ConnectionFactory.isPostgreSQL() ? "public" : null,
+                isPostgreSQL(connection) ? "public" : null,
                 tabela,
                 false,
                 false
@@ -136,7 +155,7 @@ public class DatabaseMigrationService {
     private boolean colunaExiste(Connection connection, String tabela, String coluna) throws SQLException {
         DatabaseMetaData metadata = connection.getMetaData();
         String catalogo = connection.getCatalog();
-        String schema = ConnectionFactory.isPostgreSQL() ? "public" : null;
+        String schema = isPostgreSQL(connection) ? "public" : null;
         try (ResultSet colunas = metadata.getColumns(catalogo, schema, tabela, coluna)) {
             return colunas.next();
         }

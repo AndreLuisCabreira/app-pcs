@@ -28,21 +28,50 @@ public class JogosView extends VBox {
     private final AutorizacaoService autorizacao = new AutorizacaoService();
     private final StackPane conteudo = new StackPane();
     private final Usuario usuarioAtual;
+    private final javafx.scene.control.ComboBox<String> resolucao = new javafx.scene.control.ComboBox<>();
+    private final TextField fpsMinimo = UiSupport.texto("FPS mínimo");
+    private final TextField orcamento = UiSupport.texto("Sem limite de orçamento");
+    private final javafx.scene.control.Button aplicar = new javafx.scene.control.Button("Aplicar filtros");
 
     public JogosView(Usuario usuario) {
         this.usuarioAtual = usuario;
+        resolucao.getItems().setAll("1920x1080", "2560x1440", "3840x2160");
+        resolucao.setValue("1920x1080");
+        fpsMinimo.setText("60");
+        fpsMinimo.setPrefWidth(90);
+        aplicar.getStyleClass().add("secondary-button");
+        aplicar.setOnAction(event -> carregar());
+        javafx.scene.layout.FlowPane filtros = new javafx.scene.layout.FlowPane(12, 10,
+                UiSupport.campo("RESOLUÇÃO", resolucao), UiSupport.campo("FPS MÍNIMO", fpsMinimo),
+                UiSupport.campo("ORÇAMENTO MÁXIMO (R$)", orcamento), aplicar);
+        VBox corpo = new VBox(16, filtros, conteudo);
+        VBox.setVgrow(conteudo, Priority.ALWAYS);
         conteudo.getChildren().setAll(carregando());
         getChildren().add(UiSupport.pagina(
                 "Jogos",
-                "Explore as capas e confira FPS, qualidade gráfica e a configuração recomendada para 1080p.",
-                conteudo
+                "Escolha resolução, FPS e orçamento para consultar medições cadastradas e peças compatíveis.",
+                corpo
         ));
         VBox.setVgrow(getChildren().getFirst(), Priority.ALWAYS);
         carregar();
     }
 
     private void carregar() {
-        UiSupport.emSegundoPlano(service::listar, this::mostrarJogos, erro -> {
+        final String alvo = resolucao.getValue();
+        final int fps;
+        final double limite;
+        try {
+            fps = UiSupport.inteiro(fpsMinimo, "FPS mínimo");
+            limite = orcamento.getText().isBlank() ? Double.MAX_VALUE : UiSupport.decimal(orcamento, "Orçamento");
+            if (fps <= 0 || limite <= 0) throw new IllegalArgumentException("FPS e orçamento devem ser maiores que zero.");
+        } catch (RuntimeException e) { UiSupport.erro(e); return; }
+        aplicar.setDisable(true);
+        conteudo.getChildren().setAll(carregando());
+        UiSupport.emSegundoPlano(() -> service.listar(alvo, fps, limite), dados -> {
+            aplicar.setDisable(false);
+            mostrarJogos(dados);
+        }, erro -> {
+            aplicar.setDisable(false);
             Label mensagem = new Label("Não foi possível carregar as recomendações.");
             mensagem.getStyleClass().add("startup-error");
             conteudo.getChildren().setAll(mensagem);
@@ -125,7 +154,9 @@ public class JogosView extends VBox {
     private void mostrarDetalhes(RecomendacaoJogo recomendacao) {
         Dialog<Void> dialog = new Dialog<>();
         dialog.setTitle(recomendacao.jogo().getNome());
-        dialog.setHeaderText("Recomendação para 1920×1080 a 60 FPS");
+        dialog.setHeaderText(recomendacao.disponivel()
+                ? "Medição cadastrada em " + recomendacao.benchmark().getResolucao()
+                : "Sem configuração para os filtros selecionados");
         dialog.getDialogPane().getButtonTypes().add(ButtonType.CLOSE);
         dialog.getDialogPane().setPrefWidth(620);
         dialog.getDialogPane().setContent(recomendacao.disponivel()
@@ -151,7 +182,7 @@ public class JogosView extends VBox {
 
         Label desempenho = new Label(
                 benchmark.getFpsMedio() + " FPS médio • "
-                        + benchmark.getQualidade() + " • 1920×1080"
+                        + benchmark.getQualidade() + " • " + benchmark.getResolucao()
         );
         desempenho.getStyleClass().add("recommendation-performance");
         Label preco = new Label(UiSupport.moeda(build.getPrecoTotal()));
@@ -171,7 +202,7 @@ public class JogosView extends VBox {
     private Node detalhesIndisponiveis(Jogo jogo) {
         Label mensagem = new Label(
                 "Ainda não existe uma medição real de " + jogo.getNome()
-                        + " em 1920×1080 com pelo menos 60 FPS, ou faltam peças compatíveis no catálogo."
+                        + " para a resolução, FPS e orçamento selecionados, ou faltam peças compatíveis no catálogo."
         );
         mensagem.setWrapText(true);
         mensagem.getStyleClass().add("analysis-note");

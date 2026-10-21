@@ -4,23 +4,15 @@ $projectDirectory = Split-Path -Parent $PSScriptRoot
 $outputDirectory = Join-Path $projectDirectory 'target\classes'
 $userProfileDirectory = [Environment]::GetFolderPath('UserProfile')
 
-$javaExtension = Get-ChildItem -LiteralPath (Join-Path $userProfileDirectory '.vscode\extensions') -Directory |
-    Where-Object { $_.Name -like 'redhat.java-*-win32-x64' } |
-    Sort-Object Name -Descending |
-    Select-Object -First 1
-
-if ($null -eq $javaExtension) {
-    throw 'A extensão Language Support for Java by Red Hat não foi encontrada.'
-}
-
-$javac = Join-Path $javaExtension.FullName 'jre\21.0.11-win32-x86_64\bin\javac.exe'
-if (-not (Test-Path -LiteralPath $javac)) {
-    $javac = Get-ChildItem -LiteralPath $javaExtension.FullName -Recurse -Filter 'javac.exe' |
-        Select-Object -First 1 -ExpandProperty FullName
-}
-
-if (-not $javac -or -not (Test-Path -LiteralPath $javac)) {
-    throw 'javac não foi encontrado. Configure um JDK 17 ou superior no VS Code.'
+. (Join-Path $PSScriptRoot 'java-tools.ps1')
+$jdkHome = Get-IntraTechJdk
+$javac = Join-Path $jdkHome 'bin\javac.exe'
+$maven = Get-Command mvn -ErrorAction SilentlyContinue
+if ($maven) {
+    $env:JAVA_HOME = $jdkHome
+    & $maven.Source -B -f (Join-Path $projectDirectory 'pom.xml') compile
+    if ($LASTEXITCODE -ne 0) { throw 'A compilação Maven falhou.' }
+    return
 }
 
 $mavenRepository = Join-Path $userProfileDirectory '.m2\repository\com\mysql\mysql-connector-j'
