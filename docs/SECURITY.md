@@ -1,6 +1,6 @@
 # Segurança e privacidade — estado observado
 
-Fontes: código Java, schemas e scripts do pacote de 19/10/2026. A análise foi estática; não verificou credenciais, permissões efetivas, serviços remotos ou vulnerabilidades atuais das dependências.
+Fontes: código Java, schemas e scripts, com base em 19/10/2026 e complementos de 21/10/2026. Na revisão documental de 28/10/2026 foram lidos os trechos pertinentes de autenticação, autorização e backup para conferir a descrição existente. Não foram verificadas credenciais, permissões efetivas, serviços remotos ou vulnerabilidades atuais das dependências; os resultados PGlite citados abaixo são históricos.
 
 ## Fronteiras de confiança
 
@@ -31,7 +31,7 @@ O [atualizador Java](../src/DatabaseMigrationService.java) agora chama `Database
 
 ## Credenciais e pacotes
 
-Use [.env.example](../.env.example) com valores fictícios. Não publique arquivos configurados, chaves privadas ou hashes de contas. O ZIP de entrada contém configuração local preenchida, embora fora do índice Git; sua validade não foi testada. Se uma credencial real tiver sido disponibilizada a terceiros sem autorização, o responsável deve substituí-la no serviço correspondente e atualizar suas cópias privadas.
+Use [.env.example](../.env.example) com valores fictícios. Não publique arquivos configurados, chaves privadas ou hashes de contas. Arquivos locais de configuração no ZIP devem ser tratados como privados; o conteúdo e a validade das credenciais não foram inspecionados nesta revisão. Presença no pacote e ausência no índice Git não certificam uma cópia sanitizada. Se uma credencial real tiver sido disponibilizada a terceiros sem autorização, o responsável deve substituí-la no serviço correspondente e atualizar suas cópias privadas.
 
 Antes de preparar uma cópia para compartilhamento público, exclua da seleção de empacotamento `.env`, `.env.local`, configurações privadas e históricos com segredos. Não apague a configuração de trabalho do usuário. O pacote devolvido nesta tarefa preserva os arquivos originais e não deve ser confundido com uma distribuição sanitizada para publicação.
 

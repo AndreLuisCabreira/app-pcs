@@ -2,6 +2,30 @@
 
 ## Não lançado
 
+### Correção de organização para a IDE — 2026-10-28
+
+- movido `BuildsUiSmoke.java` de `test/manual/` para a raiz de `test/`, coerente com o pacote padrão e com o acesso às classes da aplicação/fixture; não foi adicionada uma declaração de pacote incompatível;
+- removidos importações, campos e variável local sem uso em `BenchmarksView`, `BuildDialogs`, `DatabaseBackupService` e `MontagemWizardView`, preservando verificações de autorização e callbacks;
+- atualização das referências e orientação para não manter o arquivo antigo ao substituir uma pasta existente; teste de alinhamento pacote/diretório aplicado aos fontes.
+
+### Concorrência e persistência de builds — 2026-10-28
+
+- navegação de Minhas builds separa carregamento JDBC em segundo plano da criação de controles na thread JavaFX;
+- `BuildsOperacoes` distingue gravação/exclusão confirmada de falha posterior na consulta: aviso e Atualizar lista, sem induzir repetição da escrita;
+- falha real de gravação preserva o rascunho; as abas ficam desabilitadas durante gravação, exclusão e atualização da lista;
+- formatação monetária usa `NumberFormat` por thread; regressão concorrente reproduziu uma exceção antes da correção;
+- sete testes JUnit novos, totalizando 71 aprovados, e smoke JavaFX/H2 versionado de carregamento, montagem, falhas, recuperação, edição e exclusão;
+- sem mudança de schema, migration, dependências ou política monetária; outras páginas do shell, cadastro concorrente de ADMIN e demais débitos continuam pendentes.
+
+### Revisão documental — 2026-10-28
+
+- adotados os documentos de `docs/` como referência, conforme esclarecimento do mantenedor nesta tarefa;
+- adicionado índice documental com fonte principal por assunto e matriz de ações, sem excluir ou mover documentos;
+- atualizados README, instruções de agentes e guias de arquitetura, desenvolvimento, requisitos, segurança, testes, débitos e distribuição para distinguir estado observado, pendências e resultados históricos;
+- completada a rastreabilidade de troca de senha, backup, comparação/exportação e filtros já implementados;
+- corrigida a referência isolada a 54 testes: o registro posterior é de 64 e a inspeção atual contou 64 métodos `@Test` em 16 classes, sem executar a suíte;
+- adicionado relatório de escopo, preservação, verificações e Git; nenhuma alteração de código, SQL, scripts, dependências ou configuração e nenhuma execução de build, migration, commit ou deploy.
+
 ### Montagem guiada — 2026-10-21
 
 - Minhas builds separa configurações salvas e assistente de montagem em abas;

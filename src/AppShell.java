@@ -27,6 +27,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.prefs.Preferences;
 import java.util.function.Supplier;
+import java.util.function.Consumer;
+import java.util.function.Function;
 
 public class AppShell extends BorderPane {
 
@@ -38,7 +40,7 @@ public class AppShell extends BorderPane {
     private final Usuario usuario;
     private final Runnable aoSair;
     private final StackPane content = new StackPane();
-    private final Map<Button, Supplier<Node>> navigation = new LinkedHashMap<>();
+    private final Map<Button, CarregadorPagina> navigation = new LinkedHashMap<>();
     private final Map<Button, NavigationItem> navigationItems = new LinkedHashMap<>();
     private Button activeButton;
     private VBox sidebar;
@@ -86,10 +88,12 @@ public class AppShell extends BorderPane {
             navButton("components", "Componentes", () -> new ComponentesView(usuario));
             navButton("import", "Importar catálogo", () -> new ImportacaoCatalogoView(usuario));
             navButton("benchmarks", "Benchmarks", () -> new BenchmarksView(usuario));
-            navButton("builds", "Minhas builds", () -> new BuildsView(usuario));
+            navButton("builds", "Minhas builds", () -> BuildsView.carregarDados(usuario),
+                    dados -> new BuildsView(usuario, new BuildDAO(), dados));
             navButton("analysis", "Análises", () -> new AnalisesView(usuario));
         } else {
-            navButton("builds", "Minhas builds", () -> new BuildsView(usuario));
+            navButton("builds", "Minhas builds", () -> BuildsView.carregarDados(usuario),
+                    dados -> new BuildsView(usuario, new BuildDAO(), dados));
             navButton("analysis", "Análises", () -> new AnalisesView(usuario));
         }
         navButton("dashboard", "Minha conta", () -> new ContaView(usuario, aoSair));
@@ -192,6 +196,16 @@ public class AppShell extends BorderPane {
     }
 
     private Button navButton(String iconName, String title, Supplier<Node> factory) {
+        return navButton(iconName, title,
+                (sucesso, falha) -> UiSupport.emSegundoPlano(factory, sucesso, falha));
+    }
+
+    private <T> Button navButton(String iconName, String title, Supplier<T> dados, Function<T, Node> factory) {
+        return navButton(iconName, title,
+                (sucesso, falha) -> UiSupport.carregarPagina(dados, factory, sucesso, falha));
+    }
+
+    private Button navButton(String iconName, String title, CarregadorPagina factory) {
         StackPane icon = NavigationAssets.icon(iconName, 24);
         Button button = new Button(title, icon);
         button.setMaxWidth(Double.MAX_VALUE);
@@ -255,7 +269,7 @@ public class AppShell extends BorderPane {
         });
     }
 
-    private void abrir(Button button, Supplier<Node> factory) {
+    private void abrir(Button button, CarregadorPagina factory) {
         if (activeButton != null) {
             activeButton.getStyleClass().remove("nav-active");
         }
@@ -266,12 +280,12 @@ public class AppShell extends BorderPane {
         long requisicaoAtual = ++requisicaoNavegacao;
         content.getChildren().setAll(criarCarregamento());
         navigation.keySet().forEach(item -> item.setDisable(true));
-        UiSupport.emSegundoPlano(factory, pagina -> {
-            if (requisicaoAtual == requisicaoNavegacao) {
-                content.getChildren().setAll(pagina);
-            }
+        factory.carregar(pagina -> {
+            if (requisicaoAtual != requisicaoNavegacao) return;
+            content.getChildren().setAll(pagina);
             navigation.keySet().forEach(item -> item.setDisable(false));
         }, erro -> {
+            if (requisicaoAtual != requisicaoNavegacao) return;
             navigation.keySet().forEach(item -> item.setDisable(false));
             Label mensagem = new Label("Não foi possível carregar esta tela. Tente novamente.");
             mensagem.getStyleClass().add("startup-error");
@@ -307,5 +321,10 @@ public class AppShell extends BorderPane {
     }
 
     private record NavigationItem(String title, StackPane icon) {
+    }
+
+    @FunctionalInterface
+    private interface CarregadorPagina {
+        void carregar(Consumer<Node> sucesso, Consumer<Throwable> falha);
     }
 }

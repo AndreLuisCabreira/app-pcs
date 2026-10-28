@@ -21,6 +21,8 @@ Copy-Item .env.example .env.local
 
 Edite o arquivo e preencha a senha. A aplicação não lê `.env.example` diretamente. Fontes: [ConfiguracaoAplicacao.java](../src/ConfiguracaoAplicacao.java) e [ConnectionFactory.java](../src/ConnectionFactory.java).
 
+O `Copy-Item` acima deve ser usado somente quando `.env.local` não existir; não o execute sobre uma configuração de trabalho. Os exemplos deste guia são fictícios e não exigem publicar valores privados.
+
 | Variável | Uso e padrão |
 | --- | --- |
 | `DB_URL` | JDBC; padrão MySQL local na porta 3306, banco `pcbuilder` |
@@ -63,6 +65,18 @@ Separe operação normal de provisionamento. O atualizador também executa `ALTE
 
 ## Compilar, testar e executar com Maven
 
+Os comandos abaixo foram conferidos por leitura de [pom.xml](../pom.xml) e dos scripts em 28/10/2026; não foram executados nesta revisão documental.
+
+| Objetivo | Comando | Efeito |
+| --- | --- | --- |
+| Compilar | `mvn compile` | Gera classes/recursos locais; não inicia o aplicativo |
+| Testar | `mvn test` | Compila e executa a suíte com fixtures de teste |
+| Limpar e testar | `mvn clean test` | Remove saídas em `target` antes de compilar/testar |
+| Abrir interface | `mvn javafx:run` | Inicia `DesktopLauncher`; acessa o banco configurado |
+| Abrir pelo Exec Plugin | `mvn exec:java` | Alternativa para `DesktopLauncher`, após compilar |
+
+Para um teste específico já existente: `mvn "-Dtest=MontagemPCTest" test`. Relatórios e limites das execuções estão em [TESTING.md](TESTING.md). Não confunda os comandos de teste com os procedimentos administrativos de banco.
+
 ```powershell
 mvn clean test
 mvn javafx:run
@@ -104,4 +118,4 @@ powershell -ExecutionPolicy Bypass -File .\scripts\test.ps1
 - Configuração inesperada: confira diretório de execução, `intratech.config` e variáveis do processo, sem imprimir valores privados.
 - Empacotamento: veja [DISTRIBUICAO.md](../DISTRIBUICAO.md).
 
-Fontes e testes foram compilados com JDK 21 e 54 testes passaram com JUnit Console usando as versões do POM. O Maven não conseguiu resolver dependências pela rede Java do ambiente; os JARs foram obtidos separadamente para a validação. Scripts PowerShell e executável Windows não foram executados neste ambiente Linux; veja [TESTING.md](TESTING.md).
+O registro histórico de 21/10/2026 documenta uma primeira execução com 54 testes e outra, após a montagem guiada, com 64 aprovados, por JUnit Console/JDK 21. Naquele ambiente o Maven não resolveu dependências pela rede Java e os JARs foram obtidos separadamente. Esse diagnóstico de rede é histórico, não uma falha verificada na sua instalação atual. Na etapa exclusivamente documental de 28/10/2026 não houve execução. Na implementação posterior do mesmo dia, fontes/testes foram compilados com Java 21 e 71 testes passaram por JUnit Console, além do smoke JavaFX/H2. Maven, scripts PowerShell, executável Windows e bancos nativos não foram executados nesta implementação; veja [TESTING.md](TESTING.md).

@@ -61,7 +61,7 @@ migration.
 3. Configure o banco e valide abertura, autenticação, catálogo e builds no Windows de destino.
 4. Confira arraste, minimizar/maximizar, restauração e encaixe com Win + setas. O roteiro histórico completo está em [ATUALIZACOES-CATALOGO.md](ATUALIZACOES-CATALOGO.md).
 
-O script `smoke-test-package.ps1` só verifica se o processo permanece ativo por cinco segundos; não valida o fluxo acima. Nesta entrega foram compilados/testados os fontes em Linux e renderizados os recursos novos em JavaFX headless; o executável e os scripts de empacotamento ainda precisam de conferência no Windows. O empacotador mantém a versão `1.8.1`, também presente no POM; alterações ainda não lançadas estão no [CHANGELOG.md](CHANGELOG.md).
+O script `smoke-test-package.ps1` só verifica se o processo permanece ativo por cinco segundos; não valida o fluxo acima. O registro de 21/10/2026 informa compilação/testes em Linux e renderização JavaFX headless. Na revisão documental de 28/10/2026 nenhum desses comandos foi executado novamente; o executável e os scripts de empacotamento ainda precisam de conferência no Windows. O empacotador mantém a versão `1.8.1`, também presente no POM; alterações ainda não lançadas estão no [CHANGELOG.md](CHANGELOG.md).
 
 As limitações do atualizador e da transferência de dados continuam abertas em [TECH_DEBT.md](docs/TECH_DEBT.md). O pacote de fonte atualizado preserva os arquivos originais enviados, inclusive configuração local; prepare uma cópia sanitizada específica antes de uma eventual publicação pública.
 

@@ -1,7 +1,6 @@
 import javafx.collections.FXCollections;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
-import javafx.scene.Node;
 import javafx.scene.control.*;
 import javafx.scene.layout.*;
 import model.*;
@@ -17,7 +16,6 @@ import java.util.function.Consumer;
 public final class MontagemWizardView extends BorderPane {
     private final MontagemPC estado;
     private final MontagemPC.Catalogo catalogo;
-    private final Consumer<Build> aoSalvar;
     private final VBox principal = new VBox(14);
     private final VBox resumo = new VBox(10);
     private final FlowPane etapas = new FlowPane(6, 6);
@@ -31,7 +29,7 @@ public final class MontagemWizardView extends BorderPane {
     private final Button salvar = new Button();
 
     public MontagemWizardView(MontagemPC estado, MontagemPC.Catalogo catalogo, Consumer<Build> aoSalvar) {
-        this.estado = estado; this.catalogo = catalogo; this.aoSalvar = aoSalvar;
+        this.estado = estado; this.catalogo = catalogo;
         getStyleClass().add("montagem-wizard");
         setPadding(new Insets(18, 16, 14, 16));
         titulo.getStyleClass().add("montagem-title");

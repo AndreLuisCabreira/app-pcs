@@ -2,6 +2,8 @@
 
 Aplicação desktop em JavaFX para cadastrar componentes, montar computadores, verificar compatibilidade e comparar preço, consumo e benchmarks de jogos. Projeto educacional voltado à montagem e comparação de PCs; objetivos comerciais não foram definidos.
 
+Documentação revisada em **28/10/2026**, usando os guias de `/docs` e conferência dos arquivos pertinentes do ZIP recebido. Essa etapa documental foi seguida por correções de concorrência e persistência na tela de builds, descritas abaixo e no changelog. Os resultados de cada etapa permanecem datados em [TESTING.md](docs/TESTING.md). O [índice de documentação](docs/README.md) identifica as fontes principais e as pendências de validação.
+
 ## Funcionalidades
 
 - Login e cadastro com senhas protegidas por PBKDF2; troca de senha com confirmação da senha atual.
@@ -29,7 +31,7 @@ Java 21, JavaFX 21.0.8, Maven, HikariCP, Jackson, drivers PostgreSQL/MySQL e JUn
 | `src/model`, `src/service`, `src/ui` | Domínio, serviços e utilitários de interface |
 | `src/Main.java` | Terminal administrativo autenticado, com operações globais |
 | `resources` | CSS, imagens e recursos |
-| `test` | Testes unitários |
+| `test` | Testes unitários e integração JDBC com H2 descartável |
 | `database` | Schemas dos dois bancos |
 | `scripts` | Compilação, testes, diagnósticos, atualização e empacotamento |
 | `figma-html` | Protótipo visual independente, sem persistência |
@@ -51,6 +53,8 @@ mvn javafx:run
 
 O primeiro comando compila e testa; o segundo abre a aplicação e precisa do banco. Na primeira conta gráfica de uma base vazia, o perfil é administrador. Depois do login, a interface lista as builds e favoritas da conta.
 
+Para compilar sem iniciar a aplicação, use `mvn compile`; para executar os testes sem remover previamente `target`, use `mvn test`. O `clean` remove saídas locais de compilação. Os testes usam dados locais/falsos ou H2 descartável, conforme [TESTING.md](docs/TESTING.md).
+
 Configuração, precedência de variáveis, VS Code, comandos alternativos, terminal e scripts Windows estão em [DEVELOPMENT.md](docs/DEVELOPMENT.md). A configuração de F5 incluída no ZIP inicia `DesktopLauncher`; o carregador Java lê o arquivo de ambiente. Não há variáveis de banco declaradas no `launch.json`.
 
 Para banco existente, consulte o ciclo de atualização em [DATA_MODEL.md](docs/DATA_MODEL.md) e faça backup antes de mudanças. A abertura normal apenas verifica parte do esquema; não executa migrations automaticamente.
@@ -59,7 +63,7 @@ Para banco existente, consulte o ciclo de atualização em [DATA_MODEL.md](docs/
 
 Em **Minhas builds → + Montar novo PC**, escolha processador, placa-mãe, memória, placa de vídeo, SSD e fonte, nessa ordem. A sétima etapa revisa as peças, o nome e a opção de favorita antes de salvar. Cada etapa tem busca e mostra apenas sua categoria; placa-mãe, memória e fonte respeitam as escolhas anteriores.
 
-Use **Voltar**, as etapas no topo ou o resumo lateral para rever peças. Trocas preservam as demais escolhas compatíveis; uma placa-mãe/memória incompatível ou fonte insuficiente é removida com aviso para nova seleção. Alternar entre as duas abas mantém o rascunho enquanto a tela estiver aberta. **Editar selecionada** abre uma build salva para revisão e troca de componentes, preservando sua identidade. Não é preciso alterar o banco para usar esse fluxo.
+Use **Voltar**, as etapas no topo ou o resumo lateral para rever peças. Trocas preservam as demais escolhas compatíveis; uma placa-mãe/memória incompatível ou fonte insuficiente é removida com aviso para nova seleção. Alternar entre as duas abas mantém o rascunho enquanto a tela estiver aberta. **Editar selecionada** abre uma build salva para revisão e troca de componentes, preservando sua identidade. Não é preciso alterar o banco para usar esse fluxo. Na navegação normal, os dados são buscados em segundo plano e os controles de Minhas builds são criados na thread JavaFX. Se uma gravação for confirmada mas a lista não puder ser recarregada, a tela informa o sucesso e oferece Atualizar lista, sem manter o rascunho salvo para repetição acidental. Falhas na gravação mantêm o rascunho.
 
 ## Importar componentes
 
@@ -88,6 +92,7 @@ Para gerar o pacote portátil Windows x64, consulte os pré-requisitos e comando
 
 | Assunto | Fonte principal |
 | --- | --- |
+| Navegação, matriz documental e critérios de manutenção | [Índice de documentação](docs/README.md) |
 | Instalação, configuração e execução | [Desenvolvimento](docs/DEVELOPMENT.md) |
 | Componentes e integrações | [Arquitetura](docs/ARCHITECTURE.md) |
 | Funcionalidades, critérios e fórmulas | [Requisitos e regras](docs/REQUIREMENTS.md) |
@@ -101,10 +106,11 @@ Para gerar o pacote portátil Windows x64, consulte os pré-requisitos e comando
 | Evolução do projeto | [Changelog](CHANGELOG.md) |
 | Registro histórico de catálogo e janela | [Atualizações do catálogo](ATUALIZACOES-CATALOGO.md) |
 | Protótipo HTML/CSS | [Guia do protótipo](figma-html/README.md) |
+| Escopo, mudanças e verificações de 28/10/2026 | [Relatório documental](docs/DOCUMENTATION_REPORT_2026-10-28.md) |
 
 ## Testes e roadmap
 
-Foram executados 64 testes com JDK 21/JUnit, incluindo integração JDBC em H2 descartável e dez testes do estado da montagem guiada. O assistente foi exercitado em JavaFX headless e conferido nos temas claro/escuro e na largura mínima da janela. A verificação anterior do schema e dos comandos RLS usou PostgreSQL WASM/PGlite. Isso não substitui validação no Windows nem testes contra seu Supabase. O guia de [testes](docs/TESTING.md) registra detalhes e limites. Consulte [MELHORIAS.md](MELHORIAS.md) para localizar os recursos novos.
+O registro de **21/10/2026** informa 64 testes aprovados com JDK 21/JUnit, incluindo integração JDBC em H2 descartável e dez testes do estado da montagem guiada. Também registra verificação do assistente em JavaFX headless nos temas claro/escuro e na largura mínima, além da proteção SQL em PostgreSQL WASM/PGlite. São resultados históricos, preservados em [TESTING.md](docs/TESTING.md), e não substituem validação no Windows nem testes contra seu Supabase. Após a etapa documental, a implementação de 28/10/2026 acrescentou sete regressões: **71 testes JUnit passaram**, com compilação Java 21. Também passou o smoke JavaFX/H2 de carregamento, montagem, gravação, falhas, edição e exclusão. Nenhuma credencial local foi usada; Windows e servidores nativos continuam pendentes. Consulte [MELHORIAS.md](MELHORIAS.md) para localizar os recursos novos.
 
 Evoluções pendentes: recuperação de senha esquecida, migrations versionadas, testes nativos PostgreSQL/MariaDB, compatibilidade física/BIOS, importação revisada de benchmarks, preços com fonte/data e recomendação por perfil de uso. O orçamento já filtra as configurações elegíveis por jogo; as preferências de peças do algoritmo permanecem documentadas nos requisitos.
 

@@ -1,6 +1,6 @@
 # Arquitetura observada
 
-Base: código do pacote auditado em 19/10/2026. Esta descrição não comprova execução em produção nem registra justificativas históricas não fornecidas.
+Base: auditoria de 19/10/2026 e complementos de 21/10/2026. Na revisão documental de 28/10/2026, foram reconferidos os pontos descritos de inicialização, serviços, montagem e salvamento contra os arquivos pertinentes do ZIP recebido. Esta descrição não comprova execução em produção nem registra justificativas históricas não fornecidas.
 
 ## Componentes e responsabilidades
 
@@ -61,3 +61,15 @@ Acoplamento das telas, tamanho do terminal, duplicação de validações e scrip
 `DatabaseSecurityService` aplica RLS/revogações no atualizador PostgreSQL. Os DAOs de usuários, builds e importação aceitam fornecedor JDBC interno para testar com banco descartável, preservando o construtor padrão da aplicação. `DatabaseTransfer` compartilha a lista de tabelas/colunas com o backup para evitar omitir metadados novos dos jogos.
 
 `MontagemPC` mantém uma cópia da build separada dos controles e oferece navegação, opções compatíveis e invalidação de seleções dependentes. `MontagemWizardView` renderiza busca, cards, resumo e revisão nos dois temas. `BuildsView` preserva o rascunho entre suas abas e delega a persistência aos DAOs existentes, em segundo plano e com ID do proprietário. O fluxo não acrescenta tabelas nem dependências.
+
+## Fluxo da montagem e limites das camadas
+
+1. `AppShell` usa `BuildsView.carregarDados()` em segundo plano e `UiSupport.carregarPagina()` para criar os controles na thread JavaFX a partir de `DadosIniciais`. `BuildsView` cria um `MontagemPC` independente para a nova montagem ou edição. O construtor público de conveniência continua síncrono e não é o caminho usado pela navegação normal.
+2. `MontagemWizardView` encaminha seleção, avanço e retorno ao estado; as opções de placa-mãe, memória e fonte dependem das escolhas anteriores.
+3. Na revisão, `MontagemPC.finalizar()` verifica completude, nome e compatibilidade e devolve a build a persistir. Trocar de etapa não grava dados.
+4. `BuildsView.salvar()` desabilita as abas e chama `BuildsOperacoes` por `UiSupport.emSegundoPlano`. A operação verifica propriedade, grava por DAO e distingue gravação confirmada de falha posterior na consulta da lista. O callback descarta o rascunho salvo; com lista indisponível, limpa a tabela e orienta Atualizar lista. Falha de gravação continua como erro e mantém o rascunho. A atualização usa ID e proprietário.
+5. Exclusão e atualização manual da lista também bloqueiam temporariamente as abas, serializando as operações desta tela. Exclusão confirmada com falha de consulta tem aviso próprio e remove o rascunho da build excluída.
+
+A separação dados/controles foi implementada em 28/10/2026 para Minhas builds. As demais fábricas de páginas de `AppShell` ainda seguem o carregamento legado; esta mudança não afirma resolver toda a concorrência da aplicação. `UiSupport.moeda()` usa um formatador por thread, evitando compartilhar o estado mutável de `NumberFormat`; os tipos monetários do modelo permanecem iguais.
+
+O projeto é desktop, com conexão JDBC direta; não há contrato de API HTTP próprio a documentar nesta estrutura. ADRs só devem registrar decisões confirmadas. **PENDENTE DE VALIDAÇÃO:** motivos históricos da escolha da arquitetura e eventual arquitetura para distribuição a clientes não confiáveis; veja [TECH_DEBT.md](TECH_DEBT.md).

@@ -25,7 +25,6 @@ public class BenchmarksView extends VBox {
     public static final String[] RESOLUCOES = {"1920x1080", "2560x1440", "3840x2160"};
     public static final String[] QUALIDADES = {"Baixo", "Médio", "Alto", "Ultra"};
 
-    private final Usuario usuarioAtual;
     private final AutorizacaoService autorizacao = new AutorizacaoService();
     private final BenchmarkFPSDAO benchmarkDAO = new BenchmarkFPSDAO();
     private final JogoDAO jogoDAO = new JogoDAO();
@@ -37,7 +36,6 @@ public class BenchmarksView extends VBox {
     private final ListView<BenchmarkFPS> lista = new ListView<>();
 
     public BenchmarksView(Usuario usuarioAtual) {
-        this.usuarioAtual = usuarioAtual;
         autorizacao.exigirAdmin(usuarioAtual);
 
         UiSupport.configurarCombo(jogo, Jogo::getNome);

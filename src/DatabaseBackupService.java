@@ -44,7 +44,6 @@ public final class DatabaseBackupService {
                     List<List<JsonNode>> linhas = new ArrayList<>();
                     try (Statement s=c.createStatement(); ResultSet rs=s.executeQuery(
                             "SELECT " + String.join(",",colunas) + " FROM " + tabela + " ORDER BY id")) {
-                        ResultSetMetaData meta=rs.getMetaData();
                         while (rs.next()) {
                             List<JsonNode> valores=new ArrayList<>();
                             for (int i=1;i<=colunas.length;i++) {

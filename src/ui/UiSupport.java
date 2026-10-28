@@ -22,9 +22,8 @@ import java.util.function.Supplier;
 
 public final class UiSupport {
 
-    private static final NumberFormat MOEDA = NumberFormat.getCurrencyInstance(
-            Locale.forLanguageTag("pt-BR")
-    );
+    private static final ThreadLocal<NumberFormat> MOEDA = ThreadLocal.withInitial(
+            () -> NumberFormat.getCurrencyInstance(Locale.forLanguageTag("pt-BR")));
 
     private UiSupport() {
     }
@@ -90,7 +89,7 @@ public final class UiSupport {
     }
 
     public static String moeda(double valor) {
-        return MOEDA.format(valor);
+        return MOEDA.get().format(valor);
     }
 
     public static void sucesso(String mensagem) {
@@ -157,6 +156,25 @@ public final class UiSupport {
                 Platform.runLater(() -> falha.accept(erro));
             }
         });
+    }
+
+    /** Loads data off the FX thread and creates the controls only on the FX thread. */
+    public static <T> void carregarPagina(
+            Supplier<T> carregarDados,
+            Function<T, ? extends Node> criarPagina,
+            Consumer<Node> sucesso,
+            Consumer<Throwable> falha
+    ) {
+        emSegundoPlano(carregarDados, dados -> {
+            Node pagina;
+            try {
+                pagina = criarPagina.apply(dados);
+            } catch (Throwable erro) {
+                falha.accept(erro);
+                return;
+            }
+            sucesso.accept(pagina);
+        }, falha);
     }
 
     public static <T> void executarComFeedback(
